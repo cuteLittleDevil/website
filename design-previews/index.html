@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>风格对比 · 陈懂</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --ink: #171717;
+      --mute: #666;
+      --line: #e5e5e5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    header {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 24px;
+    }
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: -0.04em;
+    }
+    header p { margin: 0; color: var(--mute); max-width: 56ch; }
+    .note {
+      max-width: 1100px;
+      margin: 0 auto 24px;
+      padding: 0 24px;
+      font-size: 14px;
+      color: var(--mute);
+    }
+    .note strong { color: var(--ink); }
+    .grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 64px;
+      display: grid;
+      gap: 28px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 1px #00000005, 0 2px 8px #00000008;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .meta h2 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+    .meta .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--mute);
+    }
+    .meta .tags span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 10px;
+      background: #fafafa;
+    }
+    .meta a {
+      font-size: 13px;
+      color: #0070f3;
+      text-decoration: none;
+    }
+    .meta a:hover { text-decoration: underline; }
+    .blurb {
+      padding: 0 20px 12px;
+      font-size: 13px;
+      color: var(--mute);
+    }
+    iframe {
+      display: block;
+      width: 100%;
+      height: 520px;
+      border: 0;
+      background: #111;
+    }
+    footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      font-size: 13px;
+      color: var(--mute);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>个人站风格对比</h1>
+    <p>同一内容骨架（Hero / 关于 / 项目卡 / 博客入口），套用 awesome-design-md 中 5 套 DESIGN 语言。正式站点当前采用 <strong>Linear</strong> 深色裁剪版（展示名 陈懂）。</p>
+  </header>
+  <p class="note">打开各预览可单独全屏查看。源码来自 <code>design-previews/*.html</code>，仅作选型，不参与构建产物。</p>
+
+  <div class="grid">
+    <section class="card">
+      <div class="meta">
+        <h2>1. Linear（当前正式站）</h2>
+        <div class="tags">
+          <span>深色</span>
+          <span>紫强调</span>
+          <span>极简 SaaS</span>
+          <span>Active</span>
+        </div>
+        <a href="./linear.html" target="_blank" rel="noopener">单独打开 →</a>
+      </div>
+      <p class="blurb">近黑画布 + 薰衣草强调色。工程感强，适合协议/基础设施类个人品牌。</p>
+      <iframe src="./linear.html" title="Linear style preview" loading="lazy"></iframe>
+    </section>
+
+    <section class="card">
+      <div class="meta">
+        <h2>2. Vercel</h2>
+        <div class="tags">
+          <span>浅色</span>
+          <span>黑白精密</span>
+          <span>开发者</span>
+        </div>
+        <a href="./vercel.html" target="_blank" rel="noopener">单独打开 →</a>
+      </div>
+      <p class="blurb">近白画布 + 墨色 CTA + 细边框卡片。备选浅色方案。</p>
+      <iframe src="./vercel.html" title="Vercel style preview" loading="lazy"></iframe>
+    </section>
+
+    <section class="card">
+      <div class="meta">
+        <h2>3. Mintlify</h2>
+        <div class="tags">
+          <span>浅色</span>
+          <span>绿色强调</span>
+          <span>文档感</span>
+        </div>
+        <a href="./mintlify.html" target="_blank" rel="noopener">单独打开 →</a>
+      </div>
+      <p class="blurb">文档站气质，黑 pill + mint 强调。读感好，个人品牌辨识度略弱于 Vercel/Claude。</p>
+      <iframe src="./mintlify.html" title="Mintlify style preview" loading="lazy"></iframe>
+    </section>
+
+    <section class="card">
+      <div class="meta">
+        <h2>4. Resend</h2>
+        <div class="tags">
+          <span>深色</span>
+          <span>衬线标题</span>
+          <span>杂志感</span>
+        </div>
+        <a href="./resend.html" target="_blank" rel="noopener">单独打开 →</a>
+      </div>
+      <p class="blurb">纯黑底 + 衬线大标题。有编辑质感，但对中文个人站略「重」，技术笔记场景可玩性一般。</p>
+      <iframe src="./resend.html" title="Resend style preview" loading="lazy"></iframe>
+    </section>
+
+    <section class="card">
+      <div class="meta">
+        <h2>5. Claude</h2>
+        <div class="tags">
+          <span>暖色</span>
+          <span>奶油底</span>
+          <span>人文编辑</span>
+        </div>
+        <a href="./claude.html" target="_blank" rel="noopener">单独打开 →</a>
+      </div>
+      <p class="blurb">奶油画布 + 珊瑚 CTA + 衬线标题。温暖、适合写作向个人站；与「车联网/协议工程」硬核气质略有温差。</p>
+      <iframe src="./claude.html" title="Claude style preview" loading="lazy"></iframe>
+    </section>
+  </div>
+
+  <footer>
+    正式站默认风格见仓库根目录 <code>DESIGN.md</code>（Linear 裁剪）。换肤：改 CSS 变量映射，勿散改组件结构。
+  </footer>
+</body>
+</html>

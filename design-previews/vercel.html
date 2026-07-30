@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vercel · Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #171717;
+      --body: #4d4d4d;
+      --mute: #888;
+      --canvas: #fff;
+      --soft: #fafafa;
+      --hair: #ebebeb;
+      --link: #0070f3;
+      --primary: #171717;
+      --on-primary: #fff;
+      --radius: 8px;
+      --max: 720px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--soft);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 40px 20px 56px; }
+    .badge {
+      display: inline-block;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--body);
+      background: var(--canvas);
+      border: 1px solid var(--hair);
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+    }
+    .lead { margin: 0 0 20px; color: var(--body); font-size: 16px; }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 100px;
+      background: var(--primary);
+      color: var(--on-primary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    .cta.ghost {
+      background: var(--canvas);
+      color: var(--ink);
+      border: 1px solid var(--hair);
+    }
+    section { margin-top: 40px; }
+    section h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .cards { display: grid; gap: 12px; }
+    .card {
+      background: var(--canvas);
+      border: 1px solid var(--hair);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 1px 1px #00000005, 0 2px 2px #0000000a;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+    .card p { margin: 0; color: var(--body); font-size: 13px; }
+    .card a { color: var(--link); font-size: 13px; text-decoration: none; }
+    .swatches { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+    .sw { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--hair); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="badge">STYLE · Vercel</span>
+    <h1>陈懂.</h1>
+    <p class="lead">Go · JT808 / 流媒体 · 开源与工程实践</p>
+    <a class="cta" href="#">阅读博客</a>
+    <a class="cta ghost" href="#">GitHub</a>
+    <section>
+      <h2>作品</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>go-jt808</h3>
+          <p>JT808 服务端 · 高并发 · 真实设备对接案例</p>
+          <p style="margin-top:8px"><a href="#">查看项目 →</a></p>
+        </article>
+        <article class="card">
+          <h3>m7s-jt1078</h3>
+          <p>JT1078 插件 · 音视频 / 对讲 / 广播</p>
+          <p style="margin-top:8px"><a href="#">查看项目 →</a></p>
+        </article>
+      </div>
+    </section>
+    <div class="swatches" title="tokens">
+      <div class="sw" style="background:#171717"></div>
+      <div class="sw" style="background:#4d4d4d"></div>
+      <div class="sw" style="background:#fafafa"></div>
+      <div class="sw" style="background:#0070f3"></div>
+      <div class="sw" style="background:#ebebeb"></div>
+    </div>
+  </div>
+</body>
+</html>

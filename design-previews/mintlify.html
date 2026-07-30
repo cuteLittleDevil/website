@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mintlify · Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0a0a0a;
+      --body: #3a3a3c;
+      --mute: #888;
+      --canvas: #fff;
+      --surface: #f7f7f7;
+      --hair: #e5e5e5;
+      --green: #00d4a4;
+      --max: 720px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--canvas);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 40px 20px 56px; }
+    .badge {
+      display: inline-block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: #1ba673;
+      background: #e8faf4;
+      border-radius: 6px;
+      padding: 4px 8px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+    }
+    .lead { margin: 0 0 20px; color: var(--body); }
+    .cta {
+      display: inline-flex;
+      height: 36px;
+      align-items: center;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    .cta.ghost {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--hair);
+    }
+    section { margin-top: 40px; }
+    section h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .cards { display: grid; gap: 12px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--hair);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 15px; }
+    .card p { margin: 0; color: var(--body); font-size: 13px; }
+    .card a { color: #00b48a; font-size: 13px; text-decoration: none; font-weight: 500; }
+    .swatches { display: flex; gap: 8px; margin-top: 20px; }
+    .sw { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--hair); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="badge">docs · mintlify</span>
+    <h1>陈懂</h1>
+    <p class="lead">Go · JT808 / 流媒体 · 开源与工程实践</p>
+    <a class="cta" href="#">阅读博客</a>
+    <a class="cta ghost" href="#">GitHub</a>
+    <section>
+      <h2>作品</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>go-jt808</h3>
+          <p>JT808 服务端 · 高并发 · 真实设备对接案例</p>
+          <p style="margin-top:8px"><a href="#">查看项目 →</a></p>
+        </article>
+        <article class="card">
+          <h3>m7s-jt1078</h3>
+          <p>JT1078 插件 · 音视频 / 对讲 / 广播</p>
+          <p style="margin-top:8px"><a href="#">查看项目 →</a></p>
+        </article>
+      </div>
+    </section>
+    <div class="swatches">
+      <div class="sw" style="background:#0a0a0a"></div>
+      <div class="sw" style="background:#00d4a4"></div>
+      <div class="sw" style="background:#f7f7f7"></div>
+      <div class="sw" style="background:#3a3a3c"></div>
+      <div class="sw" style="background:#e5e5e5"></div>
+    </div>
+  </div>
+</body>
+</html>

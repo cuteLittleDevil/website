@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Linear · Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --canvas: #010102;
+      --surface: #0f1011;
+      --hair: #23252a;
+      --ink: #f7f8f8;
+      --muted: #8a8f98;
+      --accent: #5e6ad2;
+      --accent-h: #828fff;
+      --max: 720px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--canvas);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 40px 20px 56px; }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--hair);
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin-bottom: 16px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      font-weight: 600;
+      letter-spacing: -0.05em;
+      line-height: 1.1;
+    }
+    .lead { margin: 0 0 20px; color: var(--muted); }
+    .cta {
+      display: inline-flex;
+      height: 34px;
+      align-items: center;
+      padding: 0 14px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    .cta.ghost {
+      background: transparent;
+      border: 1px solid var(--hair);
+      color: var(--ink);
+    }
+    section { margin-top: 40px; }
+    section h2 { margin: 0 0 12px; font-size: 16px; color: var(--muted); font-weight: 500; }
+    .cards { display: grid; gap: 10px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--hair);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 500; }
+    .card p { margin: 0; color: var(--muted); font-size: 13px; }
+    .card a { color: var(--accent-h); font-size: 13px; text-decoration: none; }
+    .swatches { display: flex; gap: 8px; margin-top: 20px; }
+    .sw { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--hair); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="badge">Style · Linear · Active</span>
+    <h1>陈懂</h1>
+    <p class="lead">Go · JT808 / 流媒体 · 协议与工程实践</p>
+    <a class="cta" href="#">阅读博客</a>
+    <a class="cta ghost" href="#">GitHub</a>
+    <section>
+      <h2>Projects</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>go-jt808</h3>
+          <p>JT808 服务端 · 高并发 · 真实设备对接案例</p>
+          <p style="margin-top:8px"><a href="#">Open →</a></p>
+        </article>
+        <article class="card">
+          <h3>m7s-jt1078</h3>
+          <p>JT1078 插件 · 音视频 / 对讲 / 广播</p>
+          <p style="margin-top:8px"><a href="#">Open →</a></p>
+        </article>
+      </div>
+    </section>
+    <div class="swatches">
+      <div class="sw" style="background:#010102"></div>
+      <div class="sw" style="background:#0f1011"></div>
+      <div class="sw" style="background:#5e6ad2"></div>
+      <div class="sw" style="background:#f7f8f8"></div>
+      <div class="sw" style="background:#8a8f98"></div>
+    </div>
+  </div>
+</body>
+</html>

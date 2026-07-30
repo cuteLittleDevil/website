@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Claude · Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --canvas: #faf9f5;
+      --soft: #f5f0e8;
+      --card: #efe9de;
+      --ink: #141413;
+      --body: #3d3d3a;
+      --mute: #6c6a64;
+      --hair: #e6dfd8;
+      --coral: #cc785c;
+      --max: 720px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--canvas);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 40px 20px 56px; }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      color: var(--mute);
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 4px 12px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 40px;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .lead { margin: 0 0 20px; color: var(--body); }
+    .cta {
+      display: inline-flex;
+      height: 38px;
+      align-items: center;
+      padding: 0 16px;
+      border-radius: 8px;
+      background: var(--coral);
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    .cta.ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--hair);
+    }
+    section { margin-top: 40px; }
+    section h2 {
+      margin: 0 0 12px;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 22px;
+      font-weight: 400;
+    }
+    .cards { display: grid; gap: 12px; }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+    .card p { margin: 0; color: var(--body); font-size: 13px; }
+    .card a { color: var(--coral); font-size: 13px; text-decoration: none; font-weight: 500; }
+    .swatches { display: flex; gap: 8px; margin-top: 20px; }
+    .sw { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--hair); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="badge">Claude · warm editorial</span>
+    <h1>陈懂</h1>
+    <p class="lead">Go · JT808 / 流媒体 · 开源与工程实践</p>
+    <a class="cta" href="#">阅读博客</a>
+    <a class="cta ghost" href="#">GitHub</a>
+    <section>
+      <h2>作品</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>go-jt808</h3>
+          <p>JT808 服务端 · 高并发 · 真实设备对接案例</p>
+          <p style="margin-top:8px"><a href="#">查看项目 →</a></p>
+        </article>
+        <article class="card">
+          <h3>m7s-jt1078</h3>
+          <p>JT1078 插件 · 音视频 / 对讲 / 广播</p>
+          <p style="margin-top:8px"><a href="#">查看项目 →</a></p>
+        </article>
+      </div>
+    </section>
+    <div class="swatches">
+      <div class="sw" style="background:#faf9f5"></div>
+      <div class="sw" style="background:#cc785c"></div>
+      <div class="sw" style="background:#efe9de"></div>
+      <div class="sw" style="background:#141413"></div>
+      <div class="sw" style="background:#e6dfd8"></div>
+    </div>
+  </div>
+</body>
+</html>

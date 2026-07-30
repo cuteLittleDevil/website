@@ -1,0 +1,64 @@
+/* DESIGN.md tokens — Starfield dark (stormzhang-inspired). */
+:root {
+  --color-canvas: #050510;
+  --color-surface: rgba(12, 16, 32, 0.58);
+  --color-surface-solid: #0c1020;
+  --color-surface-2: rgba(18, 24, 48, 0.72);
+  --color-surface-3: #121830;
+  --color-hairline: rgba(148, 163, 184, 0.14);
+  --color-hairline-strong: rgba(148, 163, 184, 0.28);
+
+  --color-ink: #e6edf3;
+  --color-body: #c9d1d9;
+  --color-mute: #8b949e;
+  --color-mute-deep: #6e7681;
+
+  --color-primary: #38f9d7;
+  --color-primary-hover: #60a5fa;
+  --color-on-primary: #050510;
+
+  --color-link: #60a5fa;
+  --color-link-deep: #38f9d7;
+  --color-error: #f85149;
+
+  --accent-rgb: 56, 249, 215;
+  --blue-rgb: 96, 165, 250;
+  --white-rgb: 240, 245, 255;
+
+  --color-canvas-soft: var(--color-canvas);
+  --color-canvas-soft-2: var(--color-surface-3);
+
+  --font-sans: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+
+  --text-display-xl: clamp(2.4rem, 6.5vw, 4rem);
+  --text-display-lg: clamp(1.6rem, 3.2vw, 2.25rem);
+  --text-display-md: 1.2rem;
+  --text-body-lg: 1.15rem;
+  --text-body-md: 1rem;
+  --text-body-sm: 0.875rem;
+  --text-caption: 0.8125rem;
+
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 72px;
+  --space-9: 96px;
+
+  --container: 800px;
+  --prose: 700px;
+  --header-h: 60px;
+
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.28);
+  --blur-glass: 14px;
+}
