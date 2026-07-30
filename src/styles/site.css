@@ -766,9 +766,10 @@ img {
   gap: var(--space-3);
 }
 
-.social-list a {
+.social-link {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   height: 40px;
   padding: 0 16px;
   border-radius: var(--radius-pill);
@@ -781,10 +782,28 @@ img {
   backdrop-filter: blur(8px);
 }
 
-.social-list a:hover {
+.social-link:hover {
   border-color: rgba(var(--blue-rgb), 0.5);
   color: var(--color-ink);
   text-decoration: none;
+}
+
+.social-link__icon {
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Blog / utility pages */
+.page-lead {
+  margin: 0;
+  font-size: var(--text-body-lg);
+  color: rgba(var(--white-rgb), 0.88);
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+.section--tight-top {
+  padding-top: 0;
 }
 
 /* Footer */

@@ -36,9 +36,9 @@ Every public page includes:
 | 2 | `#doing` | `doing[]` cards — **below the fold** on first paint |
 | 3 | `#projects` | `projects[]` cards |
 | 4 | `#writing` | latest N posts (default 5) from build |
-| 5 | `#connect` | `social[]` + github |
+| 5 | `#connect` | `social[]` (e.g. GitHub icon + label); do **not** spoil Earth easter egg |
 
-Note: long bio / contact live in Earth easter egg (`easterEgg`), not a separate `#about` section.
+Note: long bio on hero (`profile.bio`); WeChat/email only in Earth easter egg — never advertise the egg in copy.
 
 Hero CTAs:
 
@@ -53,9 +53,12 @@ Fold rule: first viewport must not show `#doing` section title (desktop 1440×90
 ## Blog index `/blog/`
 
 - H1: 博客 / Writing
+- Lead: `.page-lead` (no inline styles)
+- List in `.section.section--tight-top`
 - Ordered list or stacked rows of posts (newest first)
 - Each row: title (link), date, summary (if any), tags
 - Empty state: short line “暂无文章” if no posts
+- No solar-system canvas / egg scripts (home only)
 
 ---
 

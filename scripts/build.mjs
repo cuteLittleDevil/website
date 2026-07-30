@@ -19,7 +19,6 @@ const contentDir = path.join(root, "content");
 const postsDir = path.join(contentDir, "posts");
 const stylesSrc = path.join(root, "src", "styles");
 const jsSrc = path.join(root, "src", "js");
-const previewsSrc = path.join(root, "design-previews");
 
 marked.setOptions({ gfm: true, breaks: false });
 
@@ -45,6 +44,14 @@ function copyDir(src, dest) {
     if (entry.isDirectory()) copyDir(s, d);
     else fs.copyFileSync(s, d);
   }
+}
+
+function socialIcon(label) {
+  const key = String(label || "").toLowerCase();
+  if (key.includes("github")) {
+    return `<svg class="social-link__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.604-3.369-1.341-3.369-1.341-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>`;
+  }
+  return "";
 }
 
 function escapeHtml(s) {
@@ -153,12 +160,21 @@ function renderEarthEgg(profile, egg) {
     <ul class="earth-egg__contact">
 ${contactHtml}
     </ul>
-    <p class="earth-egg__tip">提示：再点一次地球可重新打开 · Esc 关闭</p>
+    <p class="earth-egg__tip">Esc 关闭</p>
   </div>
 </dialog>`;
 }
 
-function layout({ site, profile, easterEgg, title, description, body, canonicalPath = "/" }) {
+function layout({
+  site,
+  profile,
+  easterEgg,
+  title,
+  description,
+  body,
+  canonicalPath = "/",
+  homeChrome = false,
+}) {
   const pageTitle =
     title === site.title ? site.title : `${title} · ${site.title}`;
   const desc = description || site.description || "";
@@ -170,6 +186,14 @@ function layout({ site, profile, easterEgg, title, description, body, canonicalP
   <meta property="og:description" content="${escapeHtml(desc)}" />
   <meta property="og:type" content="${canonicalPath.startsWith("/blog/") && canonicalPath !== "/blog/" ? "article" : "website"}" />
   <meta property="og:site_name" content="${escapeHtml(site.title)}" />`
+    : "";
+  const solarCanvas = homeChrome
+    ? `\n  <canvas class="solar-system" id="solar-system" aria-hidden="true"></canvas>`
+    : "";
+  const homeScripts = homeChrome
+    ? `
+  <script src="/js/solar-system.js" defer></script>
+  <script src="/js/scroll-hint.js" defer></script>`
     : "";
   return `<!DOCTYPE html>
 <html lang="${escapeHtml(site.language || "zh-CN")}">
@@ -186,8 +210,7 @@ function layout({ site, profile, easterEgg, title, description, body, canonicalP
   <link rel="icon" href="${escapeHtml(profile.avatar)}" />
 </head>
 <body>
-  <canvas class="starfield" id="starfield" aria-hidden="true"></canvas>
-  <canvas class="solar-system" id="solar-system" aria-hidden="true"></canvas>
+  <canvas class="starfield" id="starfield" aria-hidden="true"></canvas>${solarCanvas}
   <header class="site-header" id="site-header">
     <div class="container site-header__inner">
       <a class="brand" href="/">
@@ -210,10 +233,8 @@ ${body}
       <p>${escapeHtml((site.footer && site.footer.note) || "Powered by Markdown + Cloudflare Pages")}</p>
     </div>
   </footer>
-${renderEarthEgg(profile, easterEgg)}
-  <script src="/js/starfield.js" defer></script>
-  <script src="/js/solar-system.js" defer></script>
-  <script src="/js/scroll-hint.js" defer></script>
+${homeChrome ? renderEarthEgg(profile, easterEgg) : ""}
+  <script src="/js/starfield.js" defer></script>${homeScripts}
 </body>
 </html>
 `;
@@ -243,6 +264,13 @@ function renderHome(siteData, posts) {
   const { site, profile, doing = [], projects = [], social = [] } = siteData;
   const latest = posts.slice(0, 5);
 
+  const socialHtml = (social.length ? social : [{ label: "GitHub", url: profile.github }])
+    .map(
+      (s) =>
+        `      <li><a class="social-link" href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(s.label)}">${socialIcon(s.label)}${escapeHtml(s.label)}</a></li>`
+    )
+    .join("\n");
+
   const focusHtml = (profile.focus || []).length
     ? `<ul class="hero__focus">
 ${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
@@ -266,13 +294,6 @@ ${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
         ${(p.tags || []).length ? `<div class="tag-row">${p.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
         <a class="card__link" href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer">查看项目 →</a>
       </article>`
-    )
-    .join("\n");
-
-  const socialHtml = (social.length ? social : [{ label: "GitHub", url: profile.github }])
-    .map(
-      (s) =>
-        `      <li><a href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(s.label)}</a></li>`
     )
     .join("\n");
 
@@ -343,6 +364,7 @@ ${socialHtml}
     description: site.description,
     body,
     canonicalPath: "/",
+    homeChrome: true,
   });
 }
 
@@ -352,10 +374,10 @@ function renderBlogIndex(siteData, posts) {
     <div class="page-head">
       <div class="container">
         <h1>博客</h1>
-        <p class="hero__tagline" style="margin:0">技术笔记与工程记录 · Markdown 直出</p>
+        <p class="page-lead">技术笔记与工程记录 · Markdown 直出</p>
       </div>
     </div>
-    <div class="section" style="padding-top:0">
+    <div class="section section--tight-top">
       <div class="container">
         ${renderPostList(posts)}
       </div>
@@ -369,6 +391,7 @@ function renderBlogIndex(siteData, posts) {
     description: `${profile.name} 的技术博客`,
     body,
     canonicalPath: "/blog/",
+    homeChrome: false,
   });
 }
 
@@ -398,6 +421,7 @@ function renderPost(siteData, post) {
     description: post.summary || site.description,
     body,
     canonicalPath: post.url,
+    homeChrome: false,
   });
 }
 
@@ -430,13 +454,11 @@ function main() {
   // keep tokens available for debugging / future splits
   fs.copyFileSync(path.join(stylesSrc, "tokens.css"), path.join(dist, "styles", "tokens.css"));
 
-  // starfield + any progressive JS
+  // starfield + progressive JS
   copyDir(jsSrc, path.join(dist, "js"));
 
-  // optional style gallery for local comparison (also deployed for easy review)
-  copyDir(previewsSrc, path.join(dist, "design-previews"));
+  // design-previews stay local only (not published to dist / production)
 
-  // Cloudflare Pages SPA fallback not needed; add simple headers optional
   writeFile(
     path.join(dist, "_headers"),
     `/styles/*
@@ -444,6 +466,28 @@ function main() {
 /js/*
   Cache-Control: public, max-age=31536000, immutable
 `
+  );
+
+  writeFile(
+    path.join(dist, "404.html"),
+    layout({
+      site: { ...siteData.site, footer: siteData.footer },
+      profile: siteData.profile,
+      easterEgg: siteData.easterEgg,
+      title: "页面不存在",
+      description: "404",
+      body: `
+    <div class="page-head">
+      <div class="container">
+        <h1>404</h1>
+        <p class="page-lead">这个地址没有内容。</p>
+        <p class="section-more"><a href="/">回首页</a> · <a href="/blog/">博客</a></p>
+      </div>
+    </div>
+`,
+      canonicalPath: "/404.html",
+      homeChrome: false,
+    })
   );
 
   const baseUrl = (siteData.site.baseUrl || "").replace(/\/$/, "");

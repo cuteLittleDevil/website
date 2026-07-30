@@ -2,7 +2,7 @@ site:
   title: 陈懂
   description: 陈懂 — Go 高并发网络 · JT808 / 流媒体 · 开源与工程实践。个人主页与技术笔记。
   language: zh-CN
-  # Production domain registered on Cloudflare
+  # Production domain (bind in Cloudflare Pages Custom domains when ready)
   baseUrl: "https://cute-little-devil.com"
   author: 陈懂
 
@@ -21,13 +21,11 @@ profile:
     - JT1078 / 国标
     - 任务状态机
 
-# 点击太阳系「地球」彩蛋弹层（联系方式；简介与主栏 bio 一致）
+# 地球彩蛋：联系方式为主（简介只在主栏 bio）
 easterEgg:
   badge: 地球来信 · 你发现了彩蛋
   title: 陈懂
-  intro: >
-    6 年 Go 后端经验，擅长高性能、高可用网络编程与私有协议落地。
-    欢迎交流协议、流媒体与工程落地。
+  intro: 欢迎交流协议、流媒体与工程落地。可直接联系：
   contact:
     - label: 微信
       value: programArtNovel
@@ -38,32 +36,29 @@ easterEgg:
       value: github.com/cuteLittleDevil
       href: "https://github.com/cuteLittleDevil"
 
-
 timeline: []
 
 doing:
   - title: 协议与接入
-    description: 完善 JT808/JT1078 协议栈与多厂家、地方标准适配；对讲链路与高并发会话治理。
+    description: JT808/JT1078 协议栈、多厂家与地方标准适配，高并发会话与对讲链路。
   - title: 流媒体与国标
-    description: JT1078 音视频、对讲与广播；JT1078 转 GB28181 PS 流，对接 m7s / ZLMediaKit 等媒体面。
-  - title: 状态机与资源调度
-    description: 用 FSM 统一任务与芯片角色生命周期，节点上下线自动迁移，缩短初始化与故障恢复时间。
-  - title: 开源与笔记
-    description: 以 go-jt808 等项目沉淀可测试、可二次开发的协议服务；把排查与取舍写成 Markdown 自动发布。
+    description: JT1078 音视频与对讲；转 GB28181，对接 m7s / ZLMediaKit 等媒体面。
+  - title: 状态机与开源
+    description: FSM 管任务与资源生命周期；go-jt808 等项目沉淀可测试、可二次开发的协议服务。
 
 projects:
   - name: go-jt808
-    description: JT808 服务端。单机 2 核 4G 并发 10w+，测试覆盖完善，支持轨迹落库、JT1078、转 GB28181、多厂家与地方标准适配；据反馈可将对接周期从数月缩短到数天。
+    description: JT808 服务端（旗舰）。单机 2 核 4G 并发 10w+，测试覆盖完善；轨迹落库、JT1078、转 GB28181、多厂家适配；对接周期可从数月缩短到数天。
     url: https://github.com/cuteLittleDevil/go-jt808
     tags: [Go, JT808, 车联网]
   - name: m7s-jt1078
-    description: monibuca 生态下的 JT1078 插件，支持音视频、对讲与广播。
+    description: monibuca 生态 JT1078 插件，支持音视频、对讲与广播。
     url: https://github.com/cuteLittleDevil/m7s-jt1078
     tags: [Go, JT1078, 流媒体]
   - name: GoCN 每日新闻
-    description: 长期参与 GoCN 社区，负责采集、整理与发布优质 Go 技术文章（2020–2023）。
+    description: 历史参与（2020–2023）：采集与整理 Go 社区优质技术文章。
     url: https://github.com/gocn/news
-    tags: [社区, Go]
+    tags: [社区, Go, 历史]
 
 social:
   - label: GitHub
