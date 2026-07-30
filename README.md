@@ -29,8 +29,8 @@ npm run preview        # 构建并在 http://localhost:4173 预览
 
 ## Cloudflare + GitHub Actions
 
-1. Pages 项目名默认 **`website-bo4`**（可用 Variable `CLOUDFLARE_PROJECT_NAME` 覆盖）。  
-   生产预览：`https://website-bo4.pages.dev`；单次部署形如 `https://<hash>.website-bo4.pages.dev`。
+1. Pages 项目名默认 **`website`**（可用 Variable `CLOUDFLARE_PROJECT_NAME` 覆盖）。  
+   生产预览一般为 `https://website.pages.dev`（若名称被占用，控制台以实际项目名为准）。
 2. **创建 API Token（最易踩坑）** — 官方要求 **Account → Cloudflare Pages → Edit**：
    - 打开 [API Tokens](https://dash.cloudflare.com/profile/api-tokens)（或 Account API Tokens）
    - **Create Token → Custom token → Get started**

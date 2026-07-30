@@ -6,7 +6,7 @@
 #   CLOUDFLARE_ACCOUNT_ID  — Account ID (dashboard URL …/dash.cloudflare.com/<ID>/… or Overview → API)
 #
 # Optional Variable:
-#   CLOUDFLARE_PROJECT_NAME — default: website-bo4 (must match Pages project name)
+#   CLOUDFLARE_PROJECT_NAME — default: website (must match Pages project name)
 #
 # Official token steps:
 #   https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/
@@ -71,7 +71,7 @@ jobs:
       - name: Resolve project name
         id: proj
         run: |
-          name="${PAGES_PROJECT:-website-bo4}"
+          name="${PAGES_PROJECT:-website}"
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "Deploy target project: $name"
 

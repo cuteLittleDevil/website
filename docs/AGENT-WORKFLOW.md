@@ -42,6 +42,7 @@ LLMs are good at filling structure, bad at remembering brand over many turns.
 4. **Build must succeed** before claiming done.
 5. **Do not commit secrets**; document required GitHub secrets only.
 6. **No private content of others** — do not fetch, scrape, copy, or publish private repos, authenticated dashboards, tokens/cookies, other people's PII, or paywalled/internal docs. Use only public references and this repo's `content/` (or text the owner pastes). If private material seems required, stop and ask the owner.
+7. **Never `git add` / `commit` / `push` without explicit user confirmation that turn** — show file list + commit message preview first; wait for 确认/可以提交. Soft “ok/continue” is not enough. See `CLAUDE.md` §提交代码前必须先问用户.
 
 ---
 
@@ -67,6 +68,7 @@ Use content from content/site.yaml and content/posts (owner-provided only).
 Run npm run build and fix errors.
 Do not add new brand colors. Do not reorder home sections without updating PAGE-CONTRACTS.md.
 Do not fetch private repos, auth-gated pages, others' PII, or secrets.
+Do not git commit or push unless the user explicitly confirmed this turn.
 ```
 
 ---
