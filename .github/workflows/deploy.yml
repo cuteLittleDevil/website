@@ -1,9 +1,15 @@
-# Build static site from Markdown and deploy to Cloudflare Pages.
-# Required GitHub secrets:
-#   CLOUDFLARE_API_TOKEN   — API token with Cloudflare Pages edit
-#   CLOUDFLARE_ACCOUNT_ID  — Account ID from Cloudflare dashboard
-# Optional vars:
-#   CLOUDFLARE_PROJECT_NAME — defaults to website
+# Build static site and deploy to Cloudflare Pages (Direct Upload via Wrangler).
+#
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   — Custom API Token: Account → Cloudflare Pages → Edit
+#                            Prefer creating under Account API Tokens if available.
+#   CLOUDFLARE_ACCOUNT_ID  — Account ID (dashboard URL …/dash.cloudflare.com/<ID>/… or Overview → API)
+#
+# Optional Variable:
+#   CLOUDFLARE_PROJECT_NAME — default: website (must match Pages project name)
+#
+# Official token steps:
+#   https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/
 
 name: Deploy to Cloudflare Pages
 
@@ -51,6 +57,10 @@ jobs:
     permissions:
       contents: read
       deployments: write
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PAGES_PROJECT: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
     steps:
       - name: Download dist
         uses: actions/download-artifact@v4
@@ -58,9 +68,60 @@ jobs:
           name: dist
           path: dist
 
+      - name: Resolve project name
+        id: proj
+        run: |
+          name="${PAGES_PROJECT:-website}"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "Deploy target project: $name"
+
+      - name: Verify Cloudflare API credentials
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "::error::Secret CLOUDFLARE_API_TOKEN is empty or missing. Add it under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          if [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "::error::Secret CLOUDFLARE_ACCOUNT_ID is empty or missing."
+            exit 1
+          fi
+          # Length only — never print the token
+          echo "Token length: ${#CLOUDFLARE_API_TOKEN} (should be > 20)"
+          echo "Account ID length: ${#CLOUDFLARE_ACCOUNT_ID} (hex, usually 32)"
+
+          code=$(curl -sS -o /tmp/cf-pages.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects")
+          echo "Cloudflare list-projects HTTP status: ${code}"
+
+          python3 - <<'PY'
+          import json, sys
+          try:
+              d = json.load(open("/tmp/cf-pages.json"))
+          except Exception as e:
+              print("Could not parse API response:", e)
+              sys.exit(1)
+          print("api.success =", d.get("success"))
+          print("api.errors  =", d.get("errors"))
+          names = [p.get("name") for p in (d.get("result") or [])]
+          print("pages projects visible to this token:", names or "(none)")
+          if not d.get("success"):
+              sys.exit(2)
+          PY
+
+          if [ "$code" != "200" ]; then
+            echo "::error::Cloudflare rejected credentials (HTTP ${code}, code 10000 is almost always wrong/missing Pages Edit permission or wrong Account ID)."
+            echo "Fix: My Profile or Account → API Tokens → Create Token → Custom → Permissions: Account | Cloudflare Pages | Edit → Account Resources: include THIS account."
+            echo "Do NOT use only the 'Edit Cloudflare Workers' template (it often lacks Pages)."
+            exit 1
+          fi
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME || 'website' }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: pages deploy dist --project-name=${{ steps.proj.outputs.name }}

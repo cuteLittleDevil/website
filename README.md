@@ -29,18 +29,28 @@ npm run preview        # 构建并在 http://localhost:4173 预览
 
 ## Cloudflare + GitHub Actions
 
-1. 在 [Cloudflare Dashboard](https://dash.cloudflare.com/) 创建 **Pages** 项目（名称默认 `website`，须与 workflow 一致）
-2. 创建 API Token：权限需包含 **Cloudflare Pages — Edit**
+1. 在 [Cloudflare Dashboard](https://dash.cloudflare.com/) 创建 **Pages** 项目（名称必须是 `website`，或设 Variable `CLOUDFLARE_PROJECT_NAME`）
+2. **创建 API Token（最易踩坑）** — 官方要求 **Account → Cloudflare Pages → Edit**：
+   - 打开 [API Tokens](https://dash.cloudflare.com/profile/api-tokens)（或 Account API Tokens）
+   - **Create Token → Custom token → Get started**
+   - Permissions 只加这一条即可部署：
+     | 第一列 | 第二列 | 第三列 |
+     |--------|--------|--------|
+     | **Account** | **Cloudflare Pages** | **Edit** |
+   - （可选）再加 **User → User Details → Read**，消除 wrangler 取邮箱警告
+   - **Account Resources**：Include → **你的那个 Account**（不要选错号）
+   - Create Token 后**整段复制**（只显示一次）
+   - ⚠️ **不要**只用 “Edit Cloudflare Workers” 模板——经常**没有** Pages 权限，会报 `Authentication error [code: 10000]`
 3. 在 GitHub 仓库 **Settings → Secrets and variables → Actions** 添加：
 
 | Secret | 说明 |
 |--------|------|
-| `CLOUDFLARE_API_TOKEN` | API Token |
-| `CLOUDFLARE_ACCOUNT_ID` | 账户 ID（Dashboard 右侧可复制） |
+| `CLOUDFLARE_API_TOKEN` | 上一步 Token（前后无空格/换行） |
+| `CLOUDFLARE_ACCOUNT_ID` | Account ID：Dashboard URL 里 `dash.cloudflare.com/<这一段>/` 或 Overview → API |
 
 可选 **Variable**：`CLOUDFLARE_PROJECT_NAME`（默认 `website`）
 
-4. 推送 `main` 后查看 **Actions** 是否成功；成功后在 Cloudflare Pages 打开访问域名。
+4. 推送 `main` 或 Actions → **Re-run**。Workflow 会先 **Verify Cloudflare API credentials**：成功应看到 `api.success = True` 与项目列表；若仍 10000，按日志重做 Token。
 
 ### 自定义域名 cute-little-devil.com
 
