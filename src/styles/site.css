@@ -441,13 +441,31 @@ img {
   padding: var(--space-8) 0;
 }
 
+/* Home chapter titles — secondary heading (观测台 / 作品手牌 / …) */
 .section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   margin: 0 0 var(--space-5);
-  font-size: var(--text-display-md);
+  font-size: clamp(1.375rem, 2.4vw, 1.75rem);
   font-weight: 600;
-  letter-spacing: var(--tracking-tight);
+  letter-spacing: var(--tracking-display);
   line-height: var(--leading-tight);
-  color: var(--color-mute);
+  color: var(--color-ink);
+}
+
+.section-title::before {
+  content: "";
+  flex-shrink: 0;
+  width: 3px;
+  height: 0.95em;
+  border-radius: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--color-primary) 0%,
+    var(--color-primary-hover) 100%
+  );
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.35);
 }
 
 .section-title + .section-lead {
@@ -486,7 +504,7 @@ img {
   );
 }
 
-/* Monochrome plate over starfield (restored blend) */
+/* Transparent PNG plate over starfield (remove.bg) */
 .doing-sky__bg {
   position: absolute;
   inset: 0;
@@ -496,9 +514,10 @@ img {
   object-position: center center;
   pointer-events: none;
   user-select: none;
-  opacity: 0.22;
+  opacity: 0.38;
+  /* light figure on transparent α → fuses with page starfield */
   mix-blend-mode: screen;
-  filter: grayscale(1) brightness(1.15) contrast(0.92);
+  filter: grayscale(1) brightness(1.2) contrast(1.05);
 }
 
 .doing-sky__svg {
@@ -516,13 +535,34 @@ img {
   font-family: var(--font-sans);
 }
 
+/*
+ * Pole labels — project type scale (tokens.css / DESIGN.md):
+ * role = body-sm + caption-like tracking; title = body-md; gap via SVG y ≈ space-3
+ */
+.doing-sky__role {
+  font-size: var(--text-body-sm); /* 14px */
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.doing-sky__title {
+  font-size: var(--text-body-md); /* 17px */
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+}
+
 .doing-sky__links {
   opacity: 0.9;
 }
 
+/* Non-pole chart stars — quieter than bright poles */
+.doing-sky__dim {
+  opacity: 0.55;
+}
+
 /*
  * Poles pulse left → right (bow aims left):
- * 造镜 (arrow) → 校准 (draw arm) → 星志 (croup) → …
+ * 造镜 (α 头) → 校准 (ι 身中) → 星志 (δ 尾) → …
  */
 .doing-sky__pole-glow {
   opacity: 0.12;
@@ -548,14 +588,14 @@ img {
   animation-delay: 0s;
 }
 
-/* 校准 draw arm (mid-left) */
+/* 校准 ι mid-body */
 .doing-sky__pole--1 .doing-sky__pole-glow,
 .doing-sky__pole--1 .doing-sky__pole-core,
 .doing-sky__pole--1 .doing-sky__label {
   animation-delay: 1.5s;
 }
 
-/* 星志 right-upper (croup) */
+/* 星志 δ Deneb Algedi tail */
 .doing-sky__pole--2 .doing-sky__pole-glow,
 .doing-sky__pole--2 .doing-sky__pole-core,
 .doing-sky__pole--2 .doing-sky__label {

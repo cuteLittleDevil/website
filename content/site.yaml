@@ -37,7 +37,7 @@ easterEgg:
 
 timeline: []
 
-doingLead: 手写 ChatGPT · MIT 课程 · AI 科普 · 点击亮星查看
+doingLead: 手写 ChatGPT · MIT 课程 · AI 科普
 doing:
   - role: 造镜
     title: 手写 ChatGPT
@@ -47,7 +47,7 @@ doing:
     description: 跟做 MIT 6.824 分布式、6.S081 操作系统等 lab，把并发、存储与容错练到手里。
   - role: 星志
     title: AI 科普
-    description: 把模型和工程概念写成好读的中文，记给想真正看懂的人。
+    description: 把模型和工程概念拆成各种小实验，动手验证比空讲更清楚。
 
 projects:
   - name: go-jt808

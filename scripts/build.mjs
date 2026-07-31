@@ -387,15 +387,68 @@ function renderTarotProjectCard(project, index) {
 }
 
 /**
- * Sagittarius chart for #doing — poles aligned to sagittarius-bg.jpg
- * (horizontally flipped: bow aims left; object-fit contain → image 1000×562.5, y0≈119).
+ * Capricornus (摩羯座) chart for #doing — main Bayer stars of the sea-goat.
  *
- * Poles (left → mid → right):
- *   [0] 造镜 — arrow tip (left)
- *   [1] 校准 — draw arm (mid-left)
- *   [2] 星志 — right upper (horse croup / withers)
+ * Classic sky shape: wide “boat” / triangle — western head (α Algedi, β Dabih)
+ * to eastern tail (γ Nashira, δ Deneb Algedi).
+ * Plate art: capricornus-bg-removebg-preview.png (sea-goat, transparent bg).
+ *
+ * Poles (west → mid → east):
+ *   [0] 造镜 — α Cap (Algedi · head / horn)
+ *   [1] 校准 — ι Cap (mid-body · one step down from θ)
+ *   [2] 星志 — δ Cap (Deneb Algedi · tail · brightest in Cap)
  */
 function renderDoingConstellation(doing = [], assetV = "0") {
+  /** Main Cap stars in viewBox 1000×800 — head left, tail right. */
+  const CAP = {
+    // Tuned to capricornus-bg plate (sea-goat facing left, head L · coil R)
+    alp: { x: 338, y: 302 }, // α2 Algedi — head / horn
+    bet: { x: 378, y: 362 }, // β Dabih
+    ome: { x: 348, y: 428 }, // ω Cap — chin / lower head
+    psi: { x: 428, y: 338 }, // ψ Cap
+    the: { x: 478, y: 318 }, // θ Dorsum — back
+    iot: { x: 538, y: 352 }, // ι Cap — mid-body
+    zet: { x: 518, y: 422 }, // ζ Cap
+    eta: { x: 598, y: 378 }, // η Cap
+    eps: { x: 578, y: 452 }, // ε Cap
+    gam: { x: 648, y: 348 }, // γ Nashira — near tail
+    del: { x: 708, y: 388 }, // δ Deneb Algedi — tail (brightest)
+  };
+
+  const poleStars = [
+    { key: "alp", labelX: 320, labelY: 238, core: "#38f9d7", roleFill: "#38f9d7" },
+    { key: "iot", labelX: 538, labelY: 286, core: "#38f9d7", roleFill: "#7dd3fc" },
+    { key: "del", labelX: 720, labelY: 322, core: "#60a5fa", roleFill: "#7dd3fc" },
+  ];
+  const poleKeys = new Set(poleStars.map((p) => p.key));
+
+  /**
+   * Capricornus stick figure (common chart topology):
+   * head α–β–ω · spine α–θ–ι–γ–δ · body β–ψ–θ, β–ζ–ι, ζ–ε–δ, ι–η–γ
+   */
+  const edges = [
+    // Head
+    ["alp", "bet"],
+    ["bet", "ome"],
+    ["ome", "alp"],
+    // Spine to tail
+    ["alp", "the"],
+    ["the", "iot"],
+    ["iot", "gam"],
+    ["gam", "del"],
+    // Body lattice
+    ["bet", "psi"],
+    ["psi", "the"],
+    ["bet", "zet"],
+    ["zet", "iot"],
+    ["the", "zet"],
+    ["zet", "eps"],
+    ["eps", "del"],
+    ["iot", "eta"],
+    ["eta", "gam"],
+    ["eta", "del"],
+  ];
+
   const poles = [0, 1, 2].map((i) => {
     const d = doing[i] || {};
     const role = String(d.role || "");
@@ -418,35 +471,73 @@ function renderDoingConstellation(doing = [], assetV = "0") {
     .map((p) => (p.role ? `${p.roleHtml}：${p.titleHtml}` : p.titleHtml))
     .join("；");
 
+  // Typography: role = body-sm, title = body-md; vertical gap ~ space-3 (12) via y offsets
   const label = (p, roleFill) =>
     `${
       p.roleHtml
-        ? `<text class="doing-sky__role" text-anchor="middle" y="-4" fill="${roleFill}" font-size="11" letter-spacing="0.14em">${p.roleHtml}</text>`
+        ? `<text class="doing-sky__role" text-anchor="middle" y="-4" fill="${roleFill}">${p.roleHtml}</text>`
         : ""
     }
-            <text class="doing-sky__title" text-anchor="middle" y="${p.roleHtml ? "16" : "4"}" fill="rgba(230,237,243,0.92)" font-size="15" font-weight="600">${p.titleHtml}</text>`;
+            <text class="doing-sky__title" text-anchor="middle" y="${p.roleHtml ? "16" : "4"}" fill="rgba(230,237,243,0.92)">${p.titleHtml}</text>`;
 
   const poleAttrs = (p, index) => {
     const name = p.role ? `${p.roleHtml}：${p.titleHtml}` : p.titleHtml;
     return `class="doing-sky__pole doing-sky__pole--${index}" role="button" tabindex="0" data-doing-pole data-role="${p.roleAttr}" data-title="${p.titleAttr}" data-description="${p.descriptionAttr}" aria-label="${name}，查看详情"`;
   };
 
+  const linkPaths = edges
+    .map(([a, b]) => {
+      const A = CAP[a];
+      const B = CAP[b];
+      return `            <path d="M${A.x} ${A.y} L ${B.x} ${B.y}"/>`;
+    })
+    .join("\n");
+
+  const dimStars = Object.entries(CAP)
+    .filter(([k]) => !poleKeys.has(k))
+    .map(([, { x, y }]) => {
+      const rHalo = 10;
+      const rCore = 2.15;
+      return `            <circle cx="${x}" cy="${y}" r="${rHalo}" fill="url(#doing-dim)"/><circle cx="${x}" cy="${y}" r="${rCore}" fill="rgba(232,238,248,0.4)"/>`;
+    })
+    .join("\n");
+
+  const poleMarkup = poleStars
+    .map((ps, index) => {
+      const { x, y } = CAP[ps.key];
+      const p = poles[index];
+      return `          <!-- [${index}] ${p.role || p.title} @ ${ps.key} -->
+          <g ${poleAttrs(p, index)}>
+            <g class="doing-sky__pole-glow" aria-hidden="true">
+              <circle cx="${x}" cy="${y}" r="36" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
+              <circle cx="${x}" cy="${y}" r="17" fill="url(#doing-bright)"/>
+            </g>
+            <circle class="doing-sky__pole-core" cx="${x}" cy="${y}" r="4.8" fill="#fff" aria-hidden="true"/>
+            <circle class="doing-sky__pole-core" cx="${x}" cy="${y}" r="1.9" fill="${ps.core}" aria-hidden="true"/>
+            <g class="doing-sky__label" transform="translate(${ps.labelX}, ${ps.labelY})" filter="url(#doing-text-glow)" aria-hidden="true">
+              ${label(p, ps.roleFill)}
+            </g>
+            <circle class="doing-sky__hit" cx="${x}" cy="${y}" r="52" fill="transparent"/>
+          </g>`;
+    })
+    .join("\n\n");
+
   return `
       <div class="doing-sky">
         <img
           class="doing-sky__bg"
-          src="/assets/sagittarius-bg.jpg?v=${escapeHtml(assetV)}"
+          src="/assets/capricornus-bg-removebg-preview.png?v=${escapeHtml(assetV)}"
           alt=""
-          width="1280"
-          height="720"
+          width="666"
+          height="375"
           decoding="async"
           aria-hidden="true"
         />
-        <svg class="doing-sky__svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="射手座星图：${ariaParts}。点击高亮星点查看详情">
+        <svg class="doing-sky__svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="摩羯座星图：${ariaParts}。点击高亮星点查看详情">
           <defs>
             <radialGradient id="doing-dim" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#e6edf3" stop-opacity="0.95"/>
-              <stop offset="40%" stop-color="rgba(148,180,220,0.45)"/>
+              <stop offset="0%" stop-color="#e6edf3" stop-opacity="0.42"/>
+              <stop offset="40%" stop-color="rgba(148,180,220,0.18)"/>
               <stop offset="100%" stop-color="rgba(148,180,220,0)"/>
             </radialGradient>
             <radialGradient id="doing-bright" cx="50%" cy="50%" r="50%">
@@ -466,82 +557,16 @@ function renderDoingConstellation(doing = [], assetV = "0") {
             </filter>
           </defs>
 
-          <!--
-            Flipped plate (bow aims left). viewBox x mirrored: x' = 1000 - x
-            造镜 arrow ~ (260, 316); 校准 arm ~ (440, 340); 星志 croup ~ (700, 355)
-          -->
-          <g class="doing-sky__links" fill="none" stroke="rgba(186,210,240,0.28)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <!-- haunch → 星志 (croup) → chest → head -->
-            <path d="M715 500 L 700 355 L 580 340 L 490 300"/>
-            <!-- head → 校准 (draw arm) → bow grip → arrow tip 造镜 (left) -->
-            <path d="M490 300 L 440 340 L 340 330 L 260 316"/>
-            <!-- bow curve accents -->
-            <path d="M340 330 L 290 250 L 260 316"/>
-            <path d="M340 330 L 300 420 L 260 316" opacity="0.75"/>
-            <!-- horse span: 星志 → mid → 校准 -->
-            <path d="M700 355 L 620 400 L 520 390 L 440 340"/>
-            <!-- legs drop -->
-            <path d="M620 400 L 660 560" opacity="0.7"/>
-            <path d="M520 390 L 500 560" opacity="0.7"/>
-            <!-- tail -->
-            <path d="M700 355 L 760 420 L 715 500" opacity="0.65"/>
+          <!-- Capricornus stick figure: head (α β) · back · tail (δ) -->
+          <g class="doing-sky__links" fill="none" stroke="rgba(186,210,240,0.32)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+${linkPaths}
           </g>
 
           <g class="doing-sky__dim" aria-hidden="true">
-            <circle cx="580" cy="340" r="10" fill="url(#doing-dim)"/><circle cx="580" cy="340" r="2.2" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="490" cy="300" r="11" fill="url(#doing-dim)"/><circle cx="490" cy="300" r="2.4" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="340" cy="330" r="11" fill="url(#doing-dim)"/><circle cx="340" cy="330" r="2.4" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="290" cy="250" r="9" fill="url(#doing-dim)"/><circle cx="290" cy="250" r="2.1" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="300" cy="420" r="9" fill="url(#doing-dim)"/><circle cx="300" cy="420" r="2.1" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="620" cy="400" r="10" fill="url(#doing-dim)"/><circle cx="620" cy="400" r="2.2" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="520" cy="390" r="10" fill="url(#doing-dim)"/><circle cx="520" cy="390" r="2.2" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="660" cy="560" r="9" fill="url(#doing-dim)"/><circle cx="660" cy="560" r="2.1" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="500" cy="560" r="9" fill="url(#doing-dim)"/><circle cx="500" cy="560" r="2.1" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="760" cy="420" r="9" fill="url(#doing-dim)"/><circle cx="760" cy="420" r="2.1" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="715" cy="500" r="9" fill="url(#doing-dim)"/><circle cx="715" cy="500" r="2.1" fill="rgba(232,238,248,0.9)"/>
+${dimStars}
           </g>
 
-          <!-- [0] 造镜 — arrow tip (left) -->
-          <g ${poleAttrs(poles[0], 0)}>
-            <g class="doing-sky__pole-glow" aria-hidden="true">
-              <circle cx="260" cy="316" r="38" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
-              <circle cx="260" cy="316" r="18" fill="url(#doing-bright)"/>
-            </g>
-            <circle class="doing-sky__pole-core" cx="260" cy="316" r="4.8" fill="#fff" aria-hidden="true"/>
-            <circle class="doing-sky__pole-core" cx="260" cy="316" r="1.9" fill="#38f9d7" aria-hidden="true"/>
-            <g class="doing-sky__label" transform="translate(260, 250)" filter="url(#doing-text-glow)" aria-hidden="true">
-              ${label(poles[0], "#38f9d7")}
-            </g>
-            <circle class="doing-sky__hit" cx="260" cy="316" r="52" fill="transparent"/>
-          </g>
-
-          <!-- [1] 校准 — draw arm (mid-left); label slightly above to clear 造镜 -->
-          <g ${poleAttrs(poles[1], 1)}>
-            <g class="doing-sky__pole-glow" aria-hidden="true">
-              <circle cx="440" cy="340" r="36" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
-              <circle cx="440" cy="340" r="17" fill="url(#doing-bright)"/>
-            </g>
-            <circle class="doing-sky__pole-core" cx="440" cy="340" r="4.8" fill="#fff" aria-hidden="true"/>
-            <circle class="doing-sky__pole-core" cx="440" cy="340" r="1.9" fill="#38f9d7" aria-hidden="true"/>
-            <g class="doing-sky__label" transform="translate(440, 274)" filter="url(#doing-text-glow)" aria-hidden="true">
-              ${label(poles[1], "#7dd3fc")}
-            </g>
-            <circle class="doing-sky__hit" cx="440" cy="340" r="52" fill="transparent"/>
-          </g>
-
-          <!-- [2] 星志 — right upper (croup / withers) -->
-          <g ${poleAttrs(poles[2], 2)}>
-            <g class="doing-sky__pole-glow" aria-hidden="true">
-              <circle cx="700" cy="355" r="36" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
-              <circle cx="700" cy="355" r="17" fill="url(#doing-bright)"/>
-            </g>
-            <circle class="doing-sky__pole-core" cx="700" cy="355" r="4.8" fill="#fff" aria-hidden="true"/>
-            <circle class="doing-sky__pole-core" cx="700" cy="355" r="1.9" fill="#60a5fa" aria-hidden="true"/>
-            <g class="doing-sky__label" transform="translate(700, 290)" filter="url(#doing-text-glow)" aria-hidden="true">
-              ${label(poles[2], "#7dd3fc")}
-            </g>
-            <circle class="doing-sky__hit" cx="700" cy="355" r="52" fill="transparent"/>
-          </g>
+${poleMarkup}
         </svg>
       </div>
       <dialog class="doing-dialog" id="doing-dialog" aria-labelledby="doing-dialog-title">
@@ -614,7 +639,6 @@ ${doingBlock}
     <section class="section" id="projects">
       <div class="container container--wide">
         <h2 class="section-title">作品手牌</h2>
-        <p class="section-lead">代表作一览</p>
         <div class="tarot-grid">
 ${projectsHtml}
         </div>
@@ -624,7 +648,6 @@ ${projectsHtml}
     <section class="section" id="writing">
       <div class="container">
         <h2 class="section-title">航行日志</h2>
-        <p class="section-lead">按时间落下的观测记录</p>
         ${renderShipLog(latest)}
         <p class="section-more"><a href="/blog/">打开完整航海志 →</a></p>
       </div>
@@ -633,7 +656,6 @@ ${projectsHtml}
     <section class="section" id="connect">
       <div class="container">
         <h2 class="section-title">地面站</h2>
-        <p class="section-lead">公开航道</p>
         <ul class="social-list">
 ${socialHtml}
         </ul>
@@ -737,7 +759,7 @@ function main() {
   for (const name of ["solar-system.js", "scroll-hint.js", "doing-sky.js", "starfield.js"]) {
     stampParts.push(fs.readFileSync(path.join(jsSrc, name)));
   }
-  const bgPath = path.join(assetsSrc, "sagittarius-bg.jpg");
+  const bgPath = path.join(assetsSrc, "capricornus-bg-removebg-preview.png");
   if (fs.existsSync(bgPath)) stampParts.push(fs.readFileSync(bgPath));
   const assetV = shortHash(Buffer.concat(stampParts.map((p) => Buffer.from(p))));
 
@@ -755,7 +777,7 @@ function main() {
   // starfield + progressive JS
   copyDir(jsSrc, path.join(dist, "js"));
 
-  // static images (e.g. sagittarius backdrop)
+  // static images (e.g. constellation backdrop)
   if (fs.existsSync(assetsSrc)) {
     copyDir(assetsSrc, path.join(dist, "assets"));
   }

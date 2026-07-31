@@ -19,7 +19,7 @@ The home page is not five unrelated blocks. It is one **night voyage** told in d
 
 ```text
 Hero        入轨 / 自我介绍          full viewport under stars
-#doing      瞄准 · 观测台           Sagittarius chart — where energy aims
+#doing      瞄准 · 观测台           Capricornus (摩羯座) chart — sea-goat stick figure
 #projects   抽牌 · 作品手牌         foil tarot cards — craft made tangible
 #writing    记航 · 航行日志         star-trail log — what was written down
 #connect    着陆 · 地面站           quiet social — public channel only
@@ -29,10 +29,10 @@ Earth egg   私密信箱（不写在文案里）  solar-system Earth click only
 | Order | `id` | Display title | Lead (optional) | Metaphor | UI form | Must not become |
 |------:|------|---------------|-----------------|----------|---------|-----------------|
 | 1 | `#hero` | name / tagline | bio + focus | 入轨 | full-bleed hero | heavy panels covering sky |
-| 2 | `#doing` | **观测台** | `doingLead` from yaml | 瞄准 / 星座 | SVG chart + poles + dialog | second card grid |
-| 3 | `#projects` | **作品手牌** | 代表作一览 | 命运与手艺 | holographic foil tarot | another constellation |
-| 4 | `#writing` | **航行日志** | 按时间落下的观测记录 | 航迹 / 星历 | vertical star-trail list | tarot or full sky map |
-| 5 | `#connect` | **地面站** | 公开航道 | 着陆 / 通讯 | quiet pills / icons | loud contact marketing |
+| 2 | `#doing` | **观测台** | `doingLead` from yaml | 瞄准 / 摩羯座 | Cap stick figure (α/ι/δ poles) + dialog | second card grid |
+| 3 | `#projects` | **作品手牌** | — | 命运与手艺 | holographic foil tarot | another constellation |
+| 4 | `#writing` | **航行日志** | — | 航迹 / 星历 | vertical star-trail list | tarot or full sky map |
+| 5 | `#connect` | **地面站** | — | 着陆 / 通讯 | quiet pills / icons | loud contact marketing |
 
 ### Design principles (narrative)
 
@@ -47,7 +47,7 @@ Earth egg   私密信箱（不写在文案里）  solar-system Earth click only
 
 | Chapter | Why this form |
 |---------|----------------|
-| 观测台 | “我在做什么” is directional — a **map of aim** fits Sagittarius / bright poles. |
+| 观测台 | “我在做什么” is directional — **Capricornus (摩羯座)** stick figure (head → back → tail). |
 | 作品手牌 | Projects are finite, chosen, showable — **cards** read as dealt craft, not a second sky. |
 | 航行日志 | Posts are chronological prose — a **log / trail** beats another card grid. |
 | 地面站 | Contact is real-world — **minimal chrome** so the sky stays dominant; privacy rules above. |
@@ -96,7 +96,7 @@ When adding a new home block: update this table + `docs/PAGE-CONTRACTS.md` first
 |-------|------|--------|-----|
 | display-xl | clamp 40–72px | 600 | Hero name |
 | display-lg | 28–36px | 600 | Page titles |
-| display-md | 18–22px | 600 | Section titles |
+| display-md | clamp ~22–28px | 600 | Home section titles (`.section-title` / h2 chapters) |
 | body-lg | 18–20px | 400–500 | Tagline |
 | body-md | 16–17px | 400 | Default UI |
 | body-sm | 14px | 400 | Nav, cards |
@@ -114,7 +114,7 @@ On Apple devices this resolves to **SF + 苹方**; Windows to Segoe UI + 微软�
 - Hero name may use cyan→blue **static gradient text** (no shimmer animation).
 - UI body line-height ~**1.47**; posts / long bio ≥ **1.65**.
 - Large titles: slight **negative** tracking (~`-0.02em` … `-0.03em`); avoid wide positive tracking on body.
-- Section titles use mute ink, not huge marketing banners.
+- Home **section titles** (观测台 / 作品手牌 / 航行日志 / 地面站): secondary-heading weight — **ink** (not mute), display tracking, 3px cyan→blue bar `::before`; not marketing banners.
 - Decoration budget: solar opacity ~0.55–0.7 desktop / ≤0.4 mobile; Earth pulse only on hover; primary CTA solid accent, no glow.
 
 ## 4. Components
@@ -189,7 +189,7 @@ Chrome: Roman numeral + first tag as suit; center geometric sigil (SVG, cycles b
 
 Home latest posts as a **star-trail timeline** (not a second constellation chart, not tarot cards):
 
-- **Title / lead:** 「航行日志」+ 「按时间落下的观测记录」
+- **Title:** 「航行日志」（无 section lead）
 - **Track:** 1px vertical gradient (cyan → blue → fade) at left; each entry a node (9px ring)
 - **Now:** first (newest) node filled + soft cyan glow (`ship-log__item--now`)
 - **Stack (8pt):** item pad-bottom space-5 (24); content inset-left 28px; stardate → title space-2; title → summary space-2; tags gap space-2, margin-top space-3
