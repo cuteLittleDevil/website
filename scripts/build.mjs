@@ -4,6 +4,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 
@@ -19,8 +20,18 @@ const contentDir = path.join(root, "content");
 const postsDir = path.join(contentDir, "posts");
 const stylesSrc = path.join(root, "src", "styles");
 const jsSrc = path.join(root, "src", "js");
+const assetsSrc = path.join(root, "src", "assets");
 
 marked.setOptions({ gfm: true, breaks: false });
+
+/** Short content hash for cache-busting unhashed static URLs on Cloudflare. */
+function shortHash(content) {
+  return crypto.createHash("sha256").update(content).digest("hex").slice(0, 10);
+}
+
+function fileHash(filePath) {
+  return shortHash(fs.readFileSync(filePath));
+}
 
 function rmrf(dir) {
   fs.rmSync(dir, { recursive: true, force: true });
@@ -174,6 +185,7 @@ function layout({
   body,
   canonicalPath = "/",
   homeChrome = false,
+  assetV = "0",
 }) {
   const pageTitle =
     title === site.title ? site.title : `${title} · ${site.title}`;
@@ -187,14 +199,15 @@ function layout({
   <meta property="og:type" content="${canonicalPath.startsWith("/blog/") && canonicalPath !== "/blog/" ? "article" : "website"}" />
   <meta property="og:site_name" content="${escapeHtml(site.title)}" />`
     : "";
+  const v = escapeHtml(assetV);
   const solarCanvas = homeChrome
     ? `\n  <canvas class="solar-system" id="solar-system" aria-hidden="true"></canvas>`
     : "";
   const homeScripts = homeChrome
     ? `
-  <script src="/js/solar-system.js" defer></script>
-  <script src="/js/scroll-hint.js" defer></script>
-  <script src="/js/doing-sky.js" defer></script>`
+  <script src="/js/solar-system.js?v=${v}" defer></script>
+  <script src="/js/scroll-hint.js?v=${v}" defer></script>
+  <script src="/js/doing-sky.js?v=${v}" defer></script>`
     : "";
   return `<!DOCTYPE html>
 <html lang="${escapeHtml(site.language || "zh-CN")}">
@@ -204,7 +217,7 @@ function layout({
   <title>${escapeHtml(pageTitle)}</title>
   <meta name="description" content="${escapeHtml(desc)}" />
   <meta name="author" content="${escapeHtml(site.author || profile.name)}" />${canonicalTag}
-  <link rel="stylesheet" href="/styles/site.css" />
+  <link rel="stylesheet" href="/styles/site.css?v=${v}" />
   <link rel="icon" href="${escapeHtml(profile.avatar)}" />
 </head>
 <body>
@@ -267,7 +280,7 @@ ${posts
  *   [1] 校准 — right upper (horse croup / withers)
  *   [2] 星志 — right lower (haunch), spaced below 校准
  */
-function renderDoingConstellation(doing = []) {
+function renderDoingConstellation(doing = [], assetV = "0") {
   const poles = [0, 1, 2].map((i) => {
     const d = doing[i] || {};
     const role = String(d.role || "");
@@ -307,7 +320,7 @@ function renderDoingConstellation(doing = []) {
       <div class="doing-sky">
         <img
           class="doing-sky__bg"
-          src="/assets/sagittarius-bg.jpg"
+          src="/assets/sagittarius-bg.jpg?v=${escapeHtml(assetV)}"
           alt=""
           width="1280"
           height="720"
@@ -427,7 +440,7 @@ function renderDoingConstellation(doing = []) {
       </dialog>`;
 }
 
-function renderHome(siteData, posts) {
+function renderHome(siteData, posts, assetV = "0") {
   const { site, profile, doing = [], doingLead, projects = [], social = [] } = siteData;
   const latest = posts.slice(0, 5);
 
@@ -448,7 +461,7 @@ ${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
     ? `<p class="section-lead">${escapeHtml(doingLead)}</p>`
     : "";
 
-  const doingBlock = renderDoingConstellation(doing);
+  const doingBlock = renderDoingConstellation(doing, assetV);
 
   const projectsHtml = projects
     .map(
@@ -526,10 +539,11 @@ ${socialHtml}
     body,
     canonicalPath: "/",
     homeChrome: true,
+    assetV,
   });
 }
 
-function renderBlogIndex(siteData, posts) {
+function renderBlogIndex(siteData, posts, assetV = "0") {
   const { site, profile } = siteData;
   const body = `
     <div class="page-head">
@@ -553,10 +567,11 @@ function renderBlogIndex(siteData, posts) {
     body,
     canonicalPath: "/blog/",
     homeChrome: false,
+    assetV,
   });
 }
 
-function renderPost(siteData, post) {
+function renderPost(siteData, post, assetV = "0") {
   const { site, profile } = siteData;
   const tags = post.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("");
   const body = `
@@ -583,6 +598,7 @@ function renderPost(siteData, post) {
     body,
     canonicalPath: post.url,
     homeChrome: false,
+    assetV,
   });
 }
 
@@ -604,14 +620,24 @@ function main() {
   siteData.site.footer = siteData.footer;
   const posts = loadPosts();
 
-  writeFile(path.join(dist, "index.html"), renderHome(siteData, posts));
-  writeFile(path.join(dist, "blog", "index.html"), renderBlogIndex(siteData, posts));
+  // Build CSS first so HTML can cache-bust with content hash (Cloudflare immutable static).
+  const cssBundle = buildCssBundle();
+  const stampParts = [cssBundle];
+  for (const name of ["solar-system.js", "scroll-hint.js", "doing-sky.js", "starfield.js"]) {
+    stampParts.push(fs.readFileSync(path.join(jsSrc, name)));
+  }
+  const bgPath = path.join(assetsSrc, "sagittarius-bg.jpg");
+  if (fs.existsSync(bgPath)) stampParts.push(fs.readFileSync(bgPath));
+  const assetV = shortHash(Buffer.concat(stampParts.map((p) => Buffer.from(p))));
+
+  writeFile(path.join(dist, "index.html"), renderHome(siteData, posts, assetV));
+  writeFile(path.join(dist, "blog", "index.html"), renderBlogIndex(siteData, posts, assetV));
 
   for (const post of posts) {
-    writeFile(path.join(dist, "blog", post.slug, "index.html"), renderPost(siteData, post));
+    writeFile(path.join(dist, "blog", post.slug, "index.html"), renderPost(siteData, post, assetV));
   }
 
-  writeFile(path.join(dist, "styles", "site.css"), buildCssBundle());
+  writeFile(path.join(dist, "styles", "site.css"), cssBundle);
   // keep tokens available for debugging / future splits
   fs.copyFileSync(path.join(stylesSrc, "tokens.css"), path.join(dist, "styles", "tokens.css"));
 
@@ -619,13 +645,13 @@ function main() {
   copyDir(jsSrc, path.join(dist, "js"));
 
   // static images (e.g. sagittarius backdrop)
-  const assetsSrc = path.join(root, "src", "assets");
   if (fs.existsSync(assetsSrc)) {
     copyDir(assetsSrc, path.join(dist, "assets"));
   }
 
   // design-previews stay local only (not published to dist / production)
 
+  // Long-cache is OK: HTML references use ?v=<content-hash> so deploys bust clients.
   writeFile(
     path.join(dist, "_headers"),
     `/styles/*
@@ -656,6 +682,7 @@ function main() {
 `,
       canonicalPath: "/404.html",
       homeChrome: false,
+      assetV,
     })
   );
 
