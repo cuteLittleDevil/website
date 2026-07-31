@@ -81,6 +81,24 @@ jobs:
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "Deploy target project: $name"
 
+      - name: Verify dist artifact
+        run: |
+          set -euo pipefail
+          echo "PWD=$(pwd)"
+          ls -la
+          test -d dist || { echo "::error::dist/ missing after artifact download"; exit 1; }
+          ls -la dist | head -40
+          test -f dist/index.html || { echo "::error::dist/index.html missing"; exit 1; }
+          echo "dist OK ($(du -sh dist | awk '{print $1}'))"
+
+      - name: Install Wrangler
+        run: |
+          set -euo pipefail
+          # Install globally so logs are not swallowed by wrangler-action's npx wrapper
+          npm install -g wrangler@4
+          wrangler --version
+          which wrangler
+
       - name: Verify Cloudflare API credentials
         id: cfcheck
         run: |
@@ -109,7 +127,6 @@ jobs:
             if [ "$code" = "200" ]; then
               break
             fi
-            # 522/520/502/503/504 = transient Cloudflare edge / origin issues
             if [ "$code" = "522" ] || [ "$code" = "520" ] || [ "$code" = "502" ] || [ "$code" = "503" ] || [ "$code" = "504" ]; then
               echo "Transient Cloudflare error ${code}; sleeping before retry…"
               sleep $((attempt * 8))
@@ -156,36 +173,40 @@ jobs:
           exists=$(cat /tmp/cf-project-exists)
           echo "exists=$exists" >> "$GITHUB_OUTPUT"
 
-      # wrangler-action@v4 defaults to Wrangler v4 / modern Node (avoids Node 20 deprecation on the action runtime)
       - name: Create Pages project if missing
         if: steps.cfcheck.outputs.exists != 'true'
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: "4"
-          command: pages project create ${{ steps.proj.outputs.name }} --production-branch=main
+        env:
+          PROJECT_NAME: ${{ steps.proj.outputs.name }}
+        run: |
+          set -euo pipefail
+          echo "Creating Pages project: ${PROJECT_NAME}"
+          wrangler pages project create "${PROJECT_NAME}" --production-branch=main
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          wranglerVersion: "4"
-          # Transient 522/5xx from api.cloudflare.com are common; a few retries often succeed
-          command: pages deploy dist --project-name=${{ steps.proj.outputs.name }}
-        # GitHub-native step retry (Actions does not retry by default)
-        # Use a shell fallback when the action itself fails once on 522
-        id: deploy
-        continue-on-error: true
-
-      - name: Retry deploy once on failure
-        if: steps.deploy.outcome == 'failure'
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          wranglerVersion: "4"
-          command: pages deploy dist --project-name=${{ steps.proj.outputs.name }}
+        env:
+          PROJECT_NAME: ${{ steps.proj.outputs.name }}
+        run: |
+          set -euo pipefail
+          # Full stdout/stderr in the job log (wrangler-action often only prints "npx exit 1")
+          echo "Deploying dist/ → project=${PROJECT_NAME} account=${CLOUDFLARE_ACCOUNT_ID:0:6}…"
+          # Retry a few times for transient 522 / API HTML errors
+          attempt=1
+          max=4
+          while [ "$attempt" -le "$max" ]; do
+            echo "=== pages deploy attempt ${attempt}/${max} ==="
+            if wrangler pages deploy dist \
+              --project-name="${PROJECT_NAME}" \
+              --branch=main \
+              --commit-dirty=true; then
+              echo "Deploy succeeded on attempt ${attempt}"
+              exit 0
+            fi
+            status=$?
+            echo "Deploy attempt ${attempt} failed (exit ${status})"
+            if [ "$attempt" -eq "$max" ]; then
+              echo "::error::wrangler pages deploy failed after ${max} attempts. Scroll up for Wrangler stderr."
+              exit "$status"
+            fi
+            sleep $((attempt * 10))
+            attempt=$((attempt + 1))
+          done
