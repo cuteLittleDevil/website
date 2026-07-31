@@ -34,6 +34,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
+          # Node 20 is deprecated on Actions runners; match engines in package.json
           node-version: "22"
           cache: npm
 
@@ -62,6 +63,11 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PAGES_PROJECT: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
     steps:
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Download dist
         uses: actions/download-artifact@v4
         with:
@@ -91,20 +97,38 @@ jobs:
           echo "Token length: ${#CLOUDFLARE_API_TOKEN} (should be > 20)"
           echo "Account ID length: ${#CLOUDFLARE_ACCOUNT_ID} (hex, usually 32)"
 
-          code=$(curl -sS -o /tmp/cf-pages.json -w "%{http_code}" \
-            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-            -H "Content-Type: application/json" \
-            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects")
-          echo "Cloudflare list-projects HTTP status: ${code}"
+          # Retry: Cloudflare API sometimes returns HTML 522/5xx (edge timeout) instead of JSON
+          code=""
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -sS -o /tmp/cf-pages.json -w "%{http_code}" \
+              --connect-timeout 20 --max-time 60 \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" || true)
+            echo "Cloudflare list-projects attempt ${attempt}: HTTP ${code}"
+            if [ "$code" = "200" ]; then
+              break
+            fi
+            # 522/520/502/503/504 = transient Cloudflare edge / origin issues
+            if [ "$code" = "522" ] || [ "$code" = "520" ] || [ "$code" = "502" ] || [ "$code" = "503" ] || [ "$code" = "504" ]; then
+              echo "Transient Cloudflare error ${code}; sleeping before retry…"
+              sleep $((attempt * 8))
+              continue
+            fi
+            break
+          done
 
           WANT="${{ steps.proj.outputs.name }}"
           export WANT
           python3 - <<'PY'
           import json, os, sys
+          raw = open("/tmp/cf-pages.json", "rb").read()[:200]
           try:
               d = json.load(open("/tmp/cf-pages.json"))
           except Exception as e:
               print("Could not parse API response:", e)
+              print("Body starts with:", raw[:180])
+              print("Hint: HTTP 522/5xx with HTML body is usually a temporary Cloudflare API outage — re-run the job.")
               sys.exit(1)
           print("api.success =", d.get("success"))
           print("api.errors  =", d.get("errors"))
@@ -115,11 +139,14 @@ jobs:
           want = os.environ.get("WANT", "website")
           exists = want in names
           print(f"target project {want!r} exists =", exists)
-          # Write for the shell step below
           open("/tmp/cf-project-exists", "w").write("true" if exists else "false")
           PY
 
           if [ "$code" != "200" ]; then
+            if [ "$code" = "522" ] || [ "$code" = "520" ] || [ "$code" = "502" ] || [ "$code" = "503" ] || [ "$code" = "504" ]; then
+              echo "::error::Cloudflare API returned HTTP ${code} after retries (malformed HTML body). This is usually a temporary edge/API issue, not bad secrets. Re-run workflow; check https://www.cloudflarestatus.com/"
+              exit 1
+            fi
             echo "::error::Cloudflare rejected credentials (HTTP ${code}, code 10000 is almost always wrong/missing Pages Edit permission or wrong Account ID)."
             echo "Fix: My Profile or Account → API Tokens → Create Token → Custom → Permissions: Account | Cloudflare Pages | Edit → Account Resources: include THIS account."
             echo "Do NOT use only the 'Edit Cloudflare Workers' template (it often lacks Pages)."
@@ -129,18 +156,36 @@ jobs:
           exists=$(cat /tmp/cf-project-exists)
           echo "exists=$exists" >> "$GITHUB_OUTPUT"
 
+      # wrangler-action@v4 defaults to Wrangler v4 / modern Node (avoids Node 20 deprecation on the action runtime)
       - name: Create Pages project if missing
         if: steps.cfcheck.outputs.exists != 'true'
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
           command: pages project create ${{ steps.proj.outputs.name }} --production-branch=main
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          wranglerVersion: "4"
+          # Transient 522/5xx from api.cloudflare.com are common; a few retries often succeed
+          command: pages deploy dist --project-name=${{ steps.proj.outputs.name }}
+        # GitHub-native step retry (Actions does not retry by default)
+        # Use a shell fallback when the action itself fails once on 522
+        id: deploy
+        continue-on-error: true
+
+      - name: Retry deploy once on failure
+        if: steps.deploy.outcome == 'failure'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          wranglerVersion: "4"
           command: pages deploy dist --project-name=${{ steps.proj.outputs.name }}
