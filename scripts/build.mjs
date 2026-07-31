@@ -275,10 +275,10 @@ ${posts
  * Sagittarius chart for #doing — poles aligned to sagittarius-bg.jpg
  * (horizontally flipped: bow aims left; object-fit contain → image 1000×562.5, y0≈119).
  *
- * Poles:
+ * Poles (left → mid → right):
  *   [0] 造镜 — arrow tip (left)
- *   [1] 校准 — right upper (horse croup / withers)
- *   [2] 星志 — right lower (haunch), spaced below 校准
+ *   [1] 校准 — draw arm (mid-left)
+ *   [2] 星志 — right upper (horse croup / withers)
  */
 function renderDoingConstellation(doing = [], assetV = "0") {
   const poles = [0, 1, 2].map((i) => {
@@ -353,17 +353,17 @@ function renderDoingConstellation(doing = [], assetV = "0") {
 
           <!--
             Flipped plate (bow aims left). viewBox x mirrored: x' = 1000 - x
-            arrow tip ~ (260, 316); right croup ~ (700, 355); right haunch ~ (715, 500)
+            造镜 arrow ~ (260, 316); 校准 arm ~ (440, 340); 星志 croup ~ (700, 355)
           -->
           <g class="doing-sky__links" fill="none" stroke="rgba(186,210,240,0.28)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <!-- right body chain: 星志 → 校准 → chest → head -->
+            <!-- haunch → 星志 (croup) → chest → head -->
             <path d="M715 500 L 700 355 L 580 340 L 490 300"/>
-            <!-- torso → draw arm → bow grip → arrow tip 造镜 (left) -->
+            <!-- head → 校准 (draw arm) → bow grip → arrow tip 造镜 (left) -->
             <path d="M490 300 L 440 340 L 340 330 L 260 316"/>
             <!-- bow curve accents -->
             <path d="M340 330 L 290 250 L 260 316"/>
             <path d="M340 330 L 300 420 L 260 316" opacity="0.75"/>
-            <!-- horse span -->
+            <!-- horse span: 星志 → mid → 校准 -->
             <path d="M700 355 L 620 400 L 520 390 L 440 340"/>
             <!-- legs drop -->
             <path d="M620 400 L 660 560" opacity="0.7"/>
@@ -375,7 +375,6 @@ function renderDoingConstellation(doing = [], assetV = "0") {
           <g class="doing-sky__dim" aria-hidden="true">
             <circle cx="580" cy="340" r="10" fill="url(#doing-dim)"/><circle cx="580" cy="340" r="2.2" fill="rgba(232,238,248,0.9)"/>
             <circle cx="490" cy="300" r="11" fill="url(#doing-dim)"/><circle cx="490" cy="300" r="2.4" fill="rgba(232,238,248,0.9)"/>
-            <circle cx="440" cy="340" r="10" fill="url(#doing-dim)"/><circle cx="440" cy="340" r="2.2" fill="rgba(232,238,248,0.9)"/>
             <circle cx="340" cy="330" r="11" fill="url(#doing-dim)"/><circle cx="340" cy="330" r="2.4" fill="rgba(232,238,248,0.9)"/>
             <circle cx="290" cy="250" r="9" fill="url(#doing-dim)"/><circle cx="290" cy="250" r="2.1" fill="rgba(232,238,248,0.9)"/>
             <circle cx="300" cy="420" r="9" fill="url(#doing-dim)"/><circle cx="300" cy="420" r="2.1" fill="rgba(232,238,248,0.9)"/>
@@ -384,6 +383,7 @@ function renderDoingConstellation(doing = [], assetV = "0") {
             <circle cx="660" cy="560" r="9" fill="url(#doing-dim)"/><circle cx="660" cy="560" r="2.1" fill="rgba(232,238,248,0.9)"/>
             <circle cx="500" cy="560" r="9" fill="url(#doing-dim)"/><circle cx="500" cy="560" r="2.1" fill="rgba(232,238,248,0.9)"/>
             <circle cx="760" cy="420" r="9" fill="url(#doing-dim)"/><circle cx="760" cy="420" r="2.1" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="715" cy="500" r="9" fill="url(#doing-dim)"/><circle cx="715" cy="500" r="2.1" fill="rgba(232,238,248,0.9)"/>
           </g>
 
           <!-- [0] 造镜 — arrow tip (left) -->
@@ -400,32 +400,32 @@ function renderDoingConstellation(doing = [], assetV = "0") {
             <circle class="doing-sky__hit" cx="260" cy="316" r="52" fill="transparent"/>
           </g>
 
-          <!-- [1] 校准 — right upper (croup / withers) -->
+          <!-- [1] 校准 — draw arm (mid-left); label slightly above to clear 造镜 -->
           <g ${poleAttrs(poles[1], 1)}>
+            <g class="doing-sky__pole-glow" aria-hidden="true">
+              <circle cx="440" cy="340" r="36" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
+              <circle cx="440" cy="340" r="17" fill="url(#doing-bright)"/>
+            </g>
+            <circle class="doing-sky__pole-core" cx="440" cy="340" r="4.8" fill="#fff" aria-hidden="true"/>
+            <circle class="doing-sky__pole-core" cx="440" cy="340" r="1.9" fill="#38f9d7" aria-hidden="true"/>
+            <g class="doing-sky__label" transform="translate(440, 274)" filter="url(#doing-text-glow)" aria-hidden="true">
+              ${label(poles[1], "#7dd3fc")}
+            </g>
+            <circle class="doing-sky__hit" cx="440" cy="340" r="52" fill="transparent"/>
+          </g>
+
+          <!-- [2] 星志 — right upper (croup / withers) -->
+          <g ${poleAttrs(poles[2], 2)}>
             <g class="doing-sky__pole-glow" aria-hidden="true">
               <circle cx="700" cy="355" r="36" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
               <circle cx="700" cy="355" r="17" fill="url(#doing-bright)"/>
             </g>
             <circle class="doing-sky__pole-core" cx="700" cy="355" r="4.8" fill="#fff" aria-hidden="true"/>
-            <circle class="doing-sky__pole-core" cx="700" cy="355" r="1.9" fill="#38f9d7" aria-hidden="true"/>
+            <circle class="doing-sky__pole-core" cx="700" cy="355" r="1.9" fill="#60a5fa" aria-hidden="true"/>
             <g class="doing-sky__label" transform="translate(700, 290)" filter="url(#doing-text-glow)" aria-hidden="true">
-              ${label(poles[1], "#7dd3fc")}
-            </g>
-            <circle class="doing-sky__hit" cx="700" cy="355" r="52" fill="transparent"/>
-          </g>
-
-          <!-- [2] 星志 — right lower (haunch), spaced below 校准 -->
-          <g ${poleAttrs(poles[2], 2)}>
-            <g class="doing-sky__pole-glow" aria-hidden="true">
-              <circle cx="715" cy="500" r="36" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
-              <circle cx="715" cy="500" r="17" fill="url(#doing-bright)"/>
-            </g>
-            <circle class="doing-sky__pole-core" cx="715" cy="500" r="4.8" fill="#fff" aria-hidden="true"/>
-            <circle class="doing-sky__pole-core" cx="715" cy="500" r="1.9" fill="#60a5fa" aria-hidden="true"/>
-            <g class="doing-sky__label" transform="translate(715, 565)" filter="url(#doing-text-glow)" aria-hidden="true">
               ${label(poles[2], "#7dd3fc")}
             </g>
-            <circle class="doing-sky__hit" cx="715" cy="500" r="52" fill="transparent"/>
+            <circle class="doing-sky__hit" cx="700" cy="355" r="52" fill="transparent"/>
           </g>
         </svg>
       </div>

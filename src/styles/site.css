@@ -521,8 +521,8 @@ img {
 }
 
 /*
- * Poles pulse clockwise (bow aims left):
- * 造镜 (arrow left) → 校准 (right upper) → 星志 (right lower) → …
+ * Poles pulse left → right (bow aims left):
+ * 造镜 (arrow) → 校准 (draw arm) → 星志 (croup) → …
  */
 .doing-sky__pole-glow {
   opacity: 0.12;
@@ -548,14 +548,14 @@ img {
   animation-delay: 0s;
 }
 
-/* 校准 right-upper */
+/* 校准 draw arm (mid-left) */
 .doing-sky__pole--1 .doing-sky__pole-glow,
 .doing-sky__pole--1 .doing-sky__pole-core,
 .doing-sky__pole--1 .doing-sky__label {
   animation-delay: 1.5s;
 }
 
-/* 星志 right-lower */
+/* 星志 right-upper (croup) */
 .doing-sky__pole--2 .doing-sky__pole-glow,
 .doing-sky__pole--2 .doing-sky__pole-core,
 .doing-sky__pole--2 .doing-sky__label {
