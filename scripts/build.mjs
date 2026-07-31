@@ -193,7 +193,8 @@ function layout({
   const homeScripts = homeChrome
     ? `
   <script src="/js/solar-system.js" defer></script>
-  <script src="/js/scroll-hint.js" defer></script>`
+  <script src="/js/scroll-hint.js" defer></script>
+  <script src="/js/doing-sky.js" defer></script>`
     : "";
   return `<!DOCTYPE html>
 <html lang="${escapeHtml(site.language || "zh-CN")}">
@@ -203,9 +204,6 @@ function layout({
   <title>${escapeHtml(pageTitle)}</title>
   <meta name="description" content="${escapeHtml(desc)}" />
   <meta name="author" content="${escapeHtml(site.author || profile.name)}" />${canonicalTag}
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles/site.css" />
   <link rel="icon" href="${escapeHtml(profile.avatar)}" />
 </head>
@@ -260,8 +258,177 @@ ${posts
   </ul>`;
 }
 
+/**
+ * Sagittarius chart for #doing — poles aligned to sagittarius-bg.jpg
+ * (horizontally flipped: bow aims left; object-fit contain → image 1000×562.5, y0≈119).
+ *
+ * Poles:
+ *   [0] 造镜 — arrow tip (left)
+ *   [1] 校准 — right upper (horse croup / withers)
+ *   [2] 星志 — right lower (haunch), spaced below 校准
+ */
+function renderDoingConstellation(doing = []) {
+  const poles = [0, 1, 2].map((i) => {
+    const d = doing[i] || {};
+    const role = String(d.role || "");
+    const title = String(d.title || `事项 ${i + 1}`);
+    const description = String(d.description || "");
+    return {
+      role,
+      title,
+      description,
+      roleHtml: role ? escapeHtml(role) : "",
+      titleHtml: escapeHtml(title),
+      descriptionHtml: description ? escapeHtml(description) : "",
+      roleAttr: escapeHtml(role),
+      titleAttr: escapeHtml(title),
+      descriptionAttr: escapeHtml(description),
+    };
+  });
+
+  const ariaParts = poles
+    .map((p) => (p.role ? `${p.roleHtml}：${p.titleHtml}` : p.titleHtml))
+    .join("；");
+
+  const label = (p, roleFill) =>
+    `${
+      p.roleHtml
+        ? `<text class="doing-sky__role" text-anchor="middle" y="-4" fill="${roleFill}" font-size="11" letter-spacing="0.14em">${p.roleHtml}</text>`
+        : ""
+    }
+            <text class="doing-sky__title" text-anchor="middle" y="${p.roleHtml ? "16" : "4"}" fill="rgba(230,237,243,0.92)" font-size="15" font-weight="600">${p.titleHtml}</text>`;
+
+  const poleAttrs = (p, index) => {
+    const name = p.role ? `${p.roleHtml}：${p.titleHtml}` : p.titleHtml;
+    return `class="doing-sky__pole doing-sky__pole--${index}" role="button" tabindex="0" data-doing-pole data-role="${p.roleAttr}" data-title="${p.titleAttr}" data-description="${p.descriptionAttr}" aria-label="${name}，查看详情"`;
+  };
+
+  return `
+      <div class="doing-sky">
+        <img
+          class="doing-sky__bg"
+          src="/assets/sagittarius-bg.jpg"
+          alt=""
+          width="1280"
+          height="720"
+          decoding="async"
+          aria-hidden="true"
+        />
+        <svg class="doing-sky__svg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="射手座星图：${ariaParts}。点击高亮星点查看详情">
+          <defs>
+            <radialGradient id="doing-dim" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#e6edf3" stop-opacity="0.95"/>
+              <stop offset="40%" stop-color="rgba(148,180,220,0.45)"/>
+              <stop offset="100%" stop-color="rgba(148,180,220,0)"/>
+            </radialGradient>
+            <radialGradient id="doing-bright" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+              <stop offset="22%" stop-color="#38f9d7" stop-opacity="0.9"/>
+              <stop offset="55%" stop-color="#60a5fa" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="doing-blur-wide" x="-120%" y="-120%" width="340%" height="340%">
+              <feGaussianBlur stdDeviation="10"/>
+            </filter>
+            <filter id="doing-text-glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="b"/>
+              <feFlood flood-color="#050510" flood-opacity="0.75" result="c"/>
+              <feComposite in="c" in2="b" operator="in" result="s"/>
+              <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!--
+            Flipped plate (bow aims left). viewBox x mirrored: x' = 1000 - x
+            arrow tip ~ (260, 316); right croup ~ (700, 355); right haunch ~ (715, 500)
+          -->
+          <g class="doing-sky__links" fill="none" stroke="rgba(186,210,240,0.28)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <!-- right body chain: 星志 → 校准 → chest → head -->
+            <path d="M715 500 L 700 355 L 580 340 L 490 300"/>
+            <!-- torso → draw arm → bow grip → arrow tip 造镜 (left) -->
+            <path d="M490 300 L 440 340 L 340 330 L 260 316"/>
+            <!-- bow curve accents -->
+            <path d="M340 330 L 290 250 L 260 316"/>
+            <path d="M340 330 L 300 420 L 260 316" opacity="0.75"/>
+            <!-- horse span -->
+            <path d="M700 355 L 620 400 L 520 390 L 440 340"/>
+            <!-- legs drop -->
+            <path d="M620 400 L 660 560" opacity="0.7"/>
+            <path d="M520 390 L 500 560" opacity="0.7"/>
+            <!-- tail -->
+            <path d="M700 355 L 760 420 L 715 500" opacity="0.65"/>
+          </g>
+
+          <g class="doing-sky__dim" aria-hidden="true">
+            <circle cx="580" cy="340" r="10" fill="url(#doing-dim)"/><circle cx="580" cy="340" r="2.2" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="490" cy="300" r="11" fill="url(#doing-dim)"/><circle cx="490" cy="300" r="2.4" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="440" cy="340" r="10" fill="url(#doing-dim)"/><circle cx="440" cy="340" r="2.2" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="340" cy="330" r="11" fill="url(#doing-dim)"/><circle cx="340" cy="330" r="2.4" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="290" cy="250" r="9" fill="url(#doing-dim)"/><circle cx="290" cy="250" r="2.1" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="300" cy="420" r="9" fill="url(#doing-dim)"/><circle cx="300" cy="420" r="2.1" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="620" cy="400" r="10" fill="url(#doing-dim)"/><circle cx="620" cy="400" r="2.2" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="520" cy="390" r="10" fill="url(#doing-dim)"/><circle cx="520" cy="390" r="2.2" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="660" cy="560" r="9" fill="url(#doing-dim)"/><circle cx="660" cy="560" r="2.1" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="500" cy="560" r="9" fill="url(#doing-dim)"/><circle cx="500" cy="560" r="2.1" fill="rgba(232,238,248,0.9)"/>
+            <circle cx="760" cy="420" r="9" fill="url(#doing-dim)"/><circle cx="760" cy="420" r="2.1" fill="rgba(232,238,248,0.9)"/>
+          </g>
+
+          <!-- [0] 造镜 — arrow tip (left) -->
+          <g ${poleAttrs(poles[0], 0)}>
+            <g class="doing-sky__pole-glow" aria-hidden="true">
+              <circle cx="260" cy="316" r="38" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
+              <circle cx="260" cy="316" r="18" fill="url(#doing-bright)"/>
+            </g>
+            <circle class="doing-sky__pole-core" cx="260" cy="316" r="4.8" fill="#fff" aria-hidden="true"/>
+            <circle class="doing-sky__pole-core" cx="260" cy="316" r="1.9" fill="#38f9d7" aria-hidden="true"/>
+            <g class="doing-sky__label" transform="translate(260, 250)" filter="url(#doing-text-glow)" aria-hidden="true">
+              ${label(poles[0], "#38f9d7")}
+            </g>
+            <circle class="doing-sky__hit" cx="260" cy="316" r="52" fill="transparent"/>
+          </g>
+
+          <!-- [1] 校准 — right upper (croup / withers) -->
+          <g ${poleAttrs(poles[1], 1)}>
+            <g class="doing-sky__pole-glow" aria-hidden="true">
+              <circle cx="700" cy="355" r="36" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
+              <circle cx="700" cy="355" r="17" fill="url(#doing-bright)"/>
+            </g>
+            <circle class="doing-sky__pole-core" cx="700" cy="355" r="4.8" fill="#fff" aria-hidden="true"/>
+            <circle class="doing-sky__pole-core" cx="700" cy="355" r="1.9" fill="#38f9d7" aria-hidden="true"/>
+            <g class="doing-sky__label" transform="translate(700, 290)" filter="url(#doing-text-glow)" aria-hidden="true">
+              ${label(poles[1], "#7dd3fc")}
+            </g>
+            <circle class="doing-sky__hit" cx="700" cy="355" r="52" fill="transparent"/>
+          </g>
+
+          <!-- [2] 星志 — right lower (haunch), spaced below 校准 -->
+          <g ${poleAttrs(poles[2], 2)}>
+            <g class="doing-sky__pole-glow" aria-hidden="true">
+              <circle cx="715" cy="500" r="36" fill="url(#doing-bright)" filter="url(#doing-blur-wide)"/>
+              <circle cx="715" cy="500" r="17" fill="url(#doing-bright)"/>
+            </g>
+            <circle class="doing-sky__pole-core" cx="715" cy="500" r="4.8" fill="#fff" aria-hidden="true"/>
+            <circle class="doing-sky__pole-core" cx="715" cy="500" r="1.9" fill="#60a5fa" aria-hidden="true"/>
+            <g class="doing-sky__label" transform="translate(715, 565)" filter="url(#doing-text-glow)" aria-hidden="true">
+              ${label(poles[2], "#7dd3fc")}
+            </g>
+            <circle class="doing-sky__hit" cx="715" cy="500" r="52" fill="transparent"/>
+          </g>
+        </svg>
+      </div>
+      <dialog class="doing-dialog" id="doing-dialog" aria-labelledby="doing-dialog-title">
+        <div class="doing-dialog__panel">
+          <button type="button" class="doing-dialog__close" data-doing-dialog-close aria-label="关闭">×</button>
+          <p class="doing-dialog__role" id="doing-dialog-role" hidden></p>
+          <h3 class="doing-dialog__title" id="doing-dialog-title"></h3>
+          <p class="doing-dialog__desc" id="doing-dialog-desc"></p>
+          <p class="doing-dialog__tip">Esc 关闭 · 点击外部关闭</p>
+        </div>
+      </dialog>`;
+}
+
 function renderHome(siteData, posts) {
-  const { site, profile, doing = [], projects = [], social = [] } = siteData;
+  const { site, profile, doing = [], doingLead, projects = [], social = [] } = siteData;
   const latest = posts.slice(0, 5);
 
   const socialHtml = (social.length ? social : [{ label: "GitHub", url: profile.github }])
@@ -277,14 +444,11 @@ ${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
     </ul>`
     : "";
 
-  const doingHtml = doing
-    .map(
-      (d) => `      <article class="card">
-        <h3>${escapeHtml(d.title)}</h3>
-        <p>${escapeHtml(d.description)}</p>
-      </article>`
-    )
-    .join("\n");
+  const doingLeadHtml = doingLead
+    ? `<p class="section-lead">${escapeHtml(doingLead)}</p>`
+    : "";
+
+  const doingBlock = renderDoingConstellation(doing);
 
   const projectsHtml = projects
     .map(
@@ -300,7 +464,6 @@ ${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
   const body = `
     <section class="section" id="hero">
       <div class="container hero__inner">
-        <span class="eyebrow">@${escapeHtml(profile.handle)}</span>
         <h1 class="hero__name">${escapeHtml(profile.name)}</h1>
         <p class="hero__tagline">${escapeHtml(profile.tagline)}</p>
         ${
@@ -314,18 +477,16 @@ ${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
         </div>
         ${focusHtml}
       </div>
-      <a class="scroll-hint" href="#doing" aria-label="向下滚动，了解我在做什么">
-        <span class="scroll-hint__label">向下了解</span>
+      <a class="scroll-hint" href="#doing" aria-label="继续浏览">
         <span class="scroll-hint__arrow" aria-hidden="true"></span>
       </a>
     </section>
 
     <section class="section" id="doing">
-      <div class="container">
+      <div class="container container--wide">
         <h2 class="section-title">我在做什么</h2>
-        <div class="card-grid card-grid--2">
-${doingHtml}
-        </div>
+        ${doingLeadHtml}
+${doingBlock}
       </div>
     </section>
 
@@ -457,6 +618,12 @@ function main() {
   // starfield + progressive JS
   copyDir(jsSrc, path.join(dist, "js"));
 
+  // static images (e.g. sagittarius backdrop)
+  const assetsSrc = path.join(root, "src", "assets");
+  if (fs.existsSync(assetsSrc)) {
+    copyDir(assetsSrc, path.join(dist, "assets"));
+  }
+
   // design-previews stay local only (not published to dist / production)
 
   writeFile(
@@ -464,6 +631,8 @@ function main() {
     `/styles/*
   Cache-Control: public, max-age=31536000, immutable
 /js/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/*
   Cache-Control: public, max-age=31536000, immutable
 `
   );

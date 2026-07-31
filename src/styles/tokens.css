@@ -28,23 +28,33 @@
   --color-canvas-soft: var(--color-canvas);
   --color-canvas-soft-2: var(--color-surface-3);
 
-  --font-sans: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
-    "Noto Sans SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  /* System UI: SF + 苹方 on Apple; Segoe / 雅黑 elsewhere. No webfonts. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial,
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui,
+    sans-serif;
+  --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
 
-  --text-display-xl: clamp(2.4rem, 6.5vw, 4rem);
-  --text-display-lg: clamp(1.6rem, 3.2vw, 2.25rem);
-  --text-display-md: 1.2rem;
-  --text-body-lg: 1.15rem;
-  --text-body-md: 1rem;
+  --text-display-xl: clamp(2.5rem, 6.5vw, 4rem);
+  --text-display-lg: clamp(1.625rem, 3.2vw, 2.25rem);
+  --text-display-md: 1.25rem;
+  --text-body-lg: 1.125rem;
+  --text-body-md: 1.0625rem; /* 17px — Apple-like body */
   --text-body-sm: 0.875rem;
   --text-caption: 0.8125rem;
+
+  --leading-ui: 1.47;
+  --leading-body: 1.65;
+  --leading-tight: 1.15;
+  --tracking-display: -0.022em;
+  --tracking-tight: -0.015em;
 
   --radius-sm: 10px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-pill: 999px;
 
+  /* 8pt grid (4px half-step only for fine gaps) */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -52,12 +62,13 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-7: 48px;
-  --space-8: 72px;
-  --space-9: 96px;
+  --space-8: 64px;
+  --space-9: 80px;
+  --space-10: 96px;
 
   --container: 800px;
   --prose: 700px;
-  --header-h: 60px;
+  --header-h: 56px;
 
   --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.28);
   --blur-glass: 14px;

@@ -28,9 +28,11 @@ timeline:                # optional about timeline
   - year: string
     text: string
 
-doing:                   # “我在做什么” cards
-  - title: string
-    description: string
+doingLead: string        # optional one-line under section title (e.g. 观测三角 · …)
+doing:                   # “我在做什么” — first 3 items → bright poles (left / top / right); click opens dialog
+  - role: string         # optional pole label (e.g. 造镜 / 校准 / 星志)
+    title: string        # shown on chart + dialog
+    description: string  # dialog body only
 
 projects:
   - name: string

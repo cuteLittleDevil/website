@@ -9,17 +9,16 @@ site:
 profile:
   name: 陈懂
   handle: cuteLittleDevil
-  tagline: Go · 高并发网络 · JT808 / 流媒体
+  tagline: Go · 高并发网络 · JT808 · 流媒体
   avatar: https://avatars.githubusercontent.com/u/38343763?v=4
   github: https://github.com/cuteLittleDevil
   bio: >
     6 年 Go 后端经验，擅长高性能、高可用网络编程与私有协议落地。
     欢迎交流协议、流媒体与工程落地。
   focus:
-    - Go 高并发
-    - JT808 协议
-    - JT1078 / 国标
+    - JT808 / JT1078
     - 任务状态机
+    - 手写ChatGPT
 
 # 地球彩蛋：联系方式为主（简介只在主栏 bio）
 easterEgg:
@@ -38,13 +37,17 @@ easterEgg:
 
 timeline: []
 
+doingLead: 手写 ChatGPT * MIT 课程 * 开源项目
 doing:
-  - title: 协议与接入
-    description: JT808/JT1078 协议栈、多厂家与地方标准适配，高并发会话与对讲链路。
-  - title: 流媒体与国标
-    description: JT1078 音视频与对讲；转 GB28181，对接 m7s / ZLMediaKit 等媒体面。
-  - title: 状态机与开源
-    description: FSM 管任务与资源生命周期；go-jt808 等项目沉淀可测试、可二次开发的协议服务。
+  - role: 造镜
+    title: 手写 ChatGPT
+    description: 从零实现 Transformer 与训练推理链路，把模型从黑盒拆成可动手的零件。
+  - role: 校准
+    title: 系统课实验
+    description: 跟做 MIT 6.824 分布式、6.S081 操作系统等 lab，把并发、存储与容错练到手里。
+  - role: 星志
+    title: AI 科普
+    description: 把模型和工程概念写成好读的中文，记给想真正看懂的人。
 
 projects:
   - name: go-jt808

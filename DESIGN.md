@@ -17,7 +17,7 @@ Agents **must** read this file before changing any visual output. Colors live in
 - Content sits above the sky (`z-index ≥ 1`); sky is non-interactive (`pointer-events: none`).
 - Glass panels: translucent surface + hairline + light blur so text stays readable over stars.
 - Chromatic accent: cyan `#38f9d7` + soft sky blue `#60a5fa` (name gradient / CTAs / links).
-- Chinese system UI stack + Inter for Latin; quiet, personal, night-sky feel.
+- System UI stack (SF / 苹方 on Apple); quiet, personal, night-sky feel. No third-party webfonts.
 
 ## 2. Color Palette & Roles
 
@@ -51,20 +51,22 @@ Agents **must** read this file before changing any visual output. Colors live in
 | display-lg | 28–36px | 600 | Page titles |
 | display-md | 18–22px | 600 | Section titles |
 | body-lg | 18–20px | 400–500 | Tagline |
-| body-md | 16px | 400 | Default |
+| body-md | 16–17px | 400 | Default UI |
 | body-sm | 14px | 400 | Nav, cards |
 | caption | 12–13px | 400 | Meta |
 
-**Fonts**
+**Fonts** (system only — no Google Fonts / self-hosted webfonts)
 
-- Display / UI Latin: `Inter`, system-ui  
-- Chinese: `"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC"`  
-- Code: `JetBrains Mono`, ui-monospace  
+- UI / body: `-apple-system`, `BlinkMacSystemFont`, then `Segoe UI` / `Helvetica Neue`, then Chinese: `"PingFang SC"`, `"Hiragino Sans GB"`, `"Microsoft YaHei"`, `"Noto Sans SC"`, `system-ui`
+- Code: `"SF Mono"`, `ui-monospace`, `Menlo`, `Monaco`, `Consolas`, monospace
+
+On Apple devices this resolves to **SF + 苹方**; Windows to Segoe UI + 微软雅黑. Prefer native system faces over Inter or other Latin webfonts.
 
 **Rules**
 
 - Hero name may use cyan→blue **static gradient text** (no shimmer animation).
-- Body line-height ≥ 1.65 on posts; hero bio readable over sky.
+- UI body line-height ~**1.47**; posts / long bio ≥ **1.65**.
+- Large titles: slight **negative** tracking (~`-0.02em` … `-0.03em`); avoid wide positive tracking on body.
 - Section titles use mute ink, not huge marketing banners.
 - Decoration budget: solar opacity ~0.55–0.7 desktop / ≤0.4 mobile; Earth pulse only on hover; primary CTA solid accent, no glow.
 
@@ -112,13 +114,29 @@ Agents **must** read this file before changing any visual output. Colors live in
 
 ## 5. Layout Principles
 
-| Token | Value |
-|-------|-------|
-| Base unit | 4px |
+**Spacing scale** — **8pt grid** (half-step 4px allowed for hairline gaps only):
+
+| Token | Value | Typical use |
+|-------|-------|-------------|
+| space-1 | 4px | Fine inset, icon nudge |
+| space-2 | 8px | Chip gap, tight stack |
+| space-3 | 12px | Small pad, card grid gap |
+| space-4 | 16px | Default pad / list row |
+| space-5 | 24px | Card padding, title margin |
+| space-6 | 32px | Group separation |
+| space-7 | 48px | Subsection / page-head |
+| space-8 | 64px | Section vertical pad |
+| space-9 | 80px | Hero pad, large breath |
+| space-10 | 96px | Optional max breath |
+
+Prefer multiples of 8 for `padding` / `margin` / `gap`. Do not invent one-off values like 72px when 64 or 80 fits.
+
+| Layout | Value |
+|--------|-------|
 | Content max (home) | 760–840px |
 | Content max (prose) | 680–720px |
 | Page horizontal pad | 20–24px |
-| Section gap | 56–88px |
+| Section vertical pad | space-8 (64px) default |
 | Hero min height | `calc(100dvh - header)` — full first screen; next section below fold |
 | Scroll cue | Bottom of `#hero` → `#doing` (mute chevron; no motion if reduced-motion) |
 

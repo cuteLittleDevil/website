@@ -33,7 +33,7 @@ Every public page includes:
 | Order | `id` | Content source |
 |------:|------|----------------|
 | 1 | `#hero` | `profile.name`, `tagline`, `profile.bio`, `focus` chips, primary CTAs; full viewport under header |
-| 2 | `#doing` | `doing[]` cards — **below the fold** on first paint |
+| 2 | `#doing` | Sagittarius 12-star chart (3 bright poles from `doing[0..2]`); click pole → `#doing-dialog`; **below the fold** on first paint |
 | 3 | `#projects` | `projects[]` cards |
 | 4 | `#writing` | latest N posts (default 5) from build |
 | 5 | `#connect` | `social[]` (e.g. GitHub icon + label); do **not** spoil Earth easter egg |
@@ -44,7 +44,7 @@ Hero CTAs:
 
 1. Primary → `/blog/`
 2. Secondary → GitHub profile
-3. Scroll hint (not a primary CTA) → `#doing` — label like「向下了解」; decorative chevron OK
+3. Scroll hint (not a primary CTA) → `#doing` — chevron only; `aria-label` e.g.「继续浏览」(no visible label)
 
 Fold rule: first viewport must not show `#doing` section title (desktop 1440×900 / 1920×1080 and typical mobile).
 
