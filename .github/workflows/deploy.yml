@@ -22,7 +22,8 @@ on:
 
 concurrency:
   group: pages-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # false: avoid canceling an in-flight deploy mid-retry (looks like "Error: The operation was canceled.")
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -94,7 +95,7 @@ jobs:
       - name: Install Wrangler
         run: |
           set -euo pipefail
-          # Install globally so logs are not swallowed by wrangler-action's npx wrapper
+          # Install globally so full Wrangler stderr is visible in the job log
           npm install -g wrangler@4
           wrangler --version
           which wrangler
@@ -114,12 +115,13 @@ jobs:
           # Length only — never print the token
           echo "Token length: ${#CLOUDFLARE_API_TOKEN} (should be > 20)"
           echo "Account ID length: ${#CLOUDFLARE_ACCOUNT_ID} (hex, usually 32)"
+          echo "Runner region tip: 52x HTML from api.cloudflare.com is Cloudflare-side (521=web server down, 522=connection timed out)."
 
-          # Retry: Cloudflare API sometimes returns HTML 522/5xx (edge timeout) instead of JSON
+          # Retry: Cloudflare API sometimes returns HTML 52x instead of JSON
           code=""
-          for attempt in 1 2 3 4 5; do
+          for attempt in 1 2 3 4 5 6; do
             code=$(curl -sS -o /tmp/cf-pages.json -w "%{http_code}" \
-              --connect-timeout 20 --max-time 60 \
+              --connect-timeout 20 --max-time 90 \
               -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
               -H "Content-Type: application/json" \
               "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" || true)
@@ -127,11 +129,13 @@ jobs:
             if [ "$code" = "200" ]; then
               break
             fi
-            if [ "$code" = "522" ] || [ "$code" = "520" ] || [ "$code" = "502" ] || [ "$code" = "503" ] || [ "$code" = "504" ]; then
-              echo "Transient Cloudflare error ${code}; sleeping before retry…"
-              sleep $((attempt * 8))
-              continue
-            fi
+            case "$code" in
+              520|521|522|523|524|502|503|504)
+                echo "Transient Cloudflare edge/API error ${code}; sleeping before retry…"
+                sleep $((attempt * 12))
+                continue
+                ;;
+            esac
             break
           done
 
@@ -139,13 +143,14 @@ jobs:
           export WANT
           python3 - <<'PY'
           import json, os, sys
-          raw = open("/tmp/cf-pages.json", "rb").read()[:200]
+          raw = open("/tmp/cf-pages.json", "rb").read()[:240]
           try:
               d = json.load(open("/tmp/cf-pages.json"))
           except Exception as e:
               print("Could not parse API response:", e)
-              print("Body starts with:", raw[:180])
-              print("Hint: HTTP 522/5xx with HTML body is usually a temporary Cloudflare API outage — re-run the job.")
+              print("Body starts with:", raw[:200])
+              print("Hint: HTTP 521/522/5xx + HTML = temporary Cloudflare API issue (not your site code).")
+              print("Check https://www.cloudflarestatus.com/ then re-run the workflow.")
               sys.exit(1)
           print("api.success =", d.get("success"))
           print("api.errors  =", d.get("errors"))
@@ -160,18 +165,26 @@ jobs:
           PY
 
           if [ "$code" != "200" ]; then
-            if [ "$code" = "522" ] || [ "$code" = "520" ] || [ "$code" = "502" ] || [ "$code" = "503" ] || [ "$code" = "504" ]; then
-              echo "::error::Cloudflare API returned HTTP ${code} after retries (malformed HTML body). This is usually a temporary edge/API issue, not bad secrets. Re-run workflow; check https://www.cloudflarestatus.com/"
-              exit 1
-            fi
+            case "$code" in
+              520|521|522|523|524|502|503|504)
+                echo "::error::Cloudflare API returned HTTP ${code} after retries (HTML error page, Ray ID in Wrangler logs if any). This is almost never a token permission issue — re-run later; see https://www.cloudflarestatus.com/"
+                exit 1
+                ;;
+            esac
             echo "::error::Cloudflare rejected credentials (HTTP ${code}, code 10000 is almost always wrong/missing Pages Edit permission or wrong Account ID)."
-            echo "Fix: My Profile or Account → API Tokens → Create Token → Custom → Permissions: Account | Cloudflare Pages | Edit → Account Resources: include THIS account."
+            echo "Fix: API Tokens → Create Token → Custom → Permissions: Account | Cloudflare Pages | Edit → Account Resources: include THIS account."
             echo "Do NOT use only the 'Edit Cloudflare Workers' template (it often lacks Pages)."
             exit 1
           fi
 
           exists=$(cat /tmp/cf-project-exists)
           echo "exists=$exists" >> "$GITHUB_OUTPUT"
+
+      - name: Wrangler whoami (debug)
+        run: |
+          set -euo pipefail
+          echo "=== wrangler whoami ==="
+          wrangler whoami || true
 
       - name: Create Pages project if missing
         if: steps.cfcheck.outputs.exists != 'true'
@@ -187,26 +200,31 @@ jobs:
           PROJECT_NAME: ${{ steps.proj.outputs.name }}
         run: |
           set -euo pipefail
-          # Full stdout/stderr in the job log (wrangler-action often only prints "npx exit 1")
           echo "Deploying dist/ → project=${PROJECT_NAME} account=${CLOUDFLARE_ACCOUNT_ID:0:6}…"
-          # Retry a few times for transient 522 / API HTML errors
+          # Note: after `if cmd; then …; fi`, $? is often 0 even when cmd failed — capture status inside else.
           attempt=1
-          max=4
+          max=5
           while [ "$attempt" -le "$max" ]; do
             echo "=== pages deploy attempt ${attempt}/${max} ==="
-            if wrangler pages deploy dist \
+            set +e
+            wrangler pages deploy dist \
               --project-name="${PROJECT_NAME}" \
               --branch=main \
-              --commit-dirty=true; then
+              --commit-dirty=true
+            status=$?
+            set -e
+            if [ "$status" -eq 0 ]; then
               echo "Deploy succeeded on attempt ${attempt}"
               exit 0
             fi
-            status=$?
             echo "Deploy attempt ${attempt} failed (exit ${status})"
             if [ "$attempt" -eq "$max" ]; then
-              echo "::error::wrangler pages deploy failed after ${max} attempts. Scroll up for Wrangler stderr."
+              echo "::error::wrangler pages deploy failed after ${max} attempts."
+              echo "If you saw GET …/pages/projects/${PROJECT_NAME} -> 521/522 + HTML: Cloudflare API edge problem, not your dist/ contents."
+              echo "If Authentication / 10000: fix CLOUDFLARE_API_TOKEN (Pages Edit) or ACCOUNT_ID."
+              echo "If Project not found: create project 'website' in dashboard or set Variable CLOUDFLARE_PROJECT_NAME."
               exit "$status"
             fi
-            sleep $((attempt * 10))
+            sleep $((attempt * 15))
             attempt=$((attempt + 1))
           done
