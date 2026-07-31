@@ -96,9 +96,47 @@ On Apple devices this resolves to **SF + 苹方**; Windows to Segoe UI + 微软�
 
 ### Cards
 
-- Glass: translucent surface, 1px hairline, radius **14–16px**, padding 18–22px.
-- Optional `backdrop-filter: blur(12px)`.
-- Project title + summary + accent link.
+- Generic glass (if reused): translucent surface, 1px hairline, radius **14–16px**, padding 18–22px; optional `backdrop-filter: blur(12px)`.
+
+### Project tarot cards (`#projects`) — style **C holographic foil**
+
+Portrait “spread” cards (not flip) for `projects[]`. Visual language: thin animated foil rim + deep plate; starfield tokens only (no stock tarot art, no webfonts). Soft violet may appear **only** on the 2px foil gradient, never as UI fill/text primary.
+
+#### Proportion (physical tarot → web)
+
+Reference: standard tarot **2.75″ × 4.75″ (≈70×120 mm)**, ratio **≈11:19** (~0.58 width/height). Web softens slightly so long Chinese copy remains readable:
+
+| Rule | Value | Why |
+|------|-------|-----|
+| Card width (desktop col) | ~260–300px | `container--wide` 920px ÷ 3 − gaps |
+| Soft aspect | **≈5:7** (width:height ≈ 0.71) as *min* height guide | Between poker 5:7 and tall tarot 11:19; less empty for short copy |
+| `min-height` | **400px** (~5:7 at 280px) | Floor; grid stretch equalizes row |
+| Height grow | natural / equal height via grid | Never clip description |
+| Outer radius | **16px** (`--radius-lg`) | Matches site cards |
+| Foil ring | **2px** | Half-step allowed; thin “metal edge” only |
+| Inner radius | **14px** | outer − foil |
+
+#### Spacing (strict 8pt — no ad-hoc 5/10/18/72)
+
+Vertical stack top → bottom (all tokens from §5):
+
+| Region | Token | px |
+|--------|-------|-----|
+| Grid gap (desktop) | space-5 | 24 |
+| Grid gap (mobile) | space-4 | 16 |
+| Inner pad X | space-4 | 16 |
+| Inner pad top / bottom | space-5 / space-4 | 24 / 16 |
+| Top bar → sigil | space-4 | 16 |
+| Sigil box | **64×64** (space-8) diamond outer | — |
+| Sigil SVG | **40×40** | fits rotated diamond |
+| Sigil → title | space-4 | 16 |
+| Title → desc | space-3 | 12 |
+| Desc → tags | space-3 | 12 |
+| Tags → link rule | space-3 | 12 |
+| Link rule padding-top | space-3 | 12 |
+| Chip gap | space-2 | 8 |
+
+Chrome: Roman numeral + first tag as suit; center geometric sigil (SVG, cycles by index); title → description → tags → link. Hover: lift **4px** (`space-1`) + stronger foil glow. `prefers-reduced-motion`: freeze foil shift + no lift.
 
 ### Nav
 

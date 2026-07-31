@@ -34,7 +34,7 @@ Every public page includes:
 |------:|------|----------------|
 | 1 | `#hero` | `profile.name`, `tagline`, `profile.bio`, `focus` chips, primary CTAs; full viewport under header |
 | 2 | `#doing` | Sagittarius 12-star chart (3 bright poles from `doing[0..2]`); click pole → `#doing-dialog`; **below the fold** on first paint |
-| 3 | `#projects` | `projects[]` cards |
+| 3 | `#projects` | `projects[]` as holographic-foil tarot cards (`.tarot-grid` / `.tarot-card`); face-up, no flip; spacing per DESIGN.md |
 | 4 | `#writing` | latest N posts (default 5) from build |
 | 5 | `#connect` | `social[]` (e.g. GitHub icon + label); do **not** spoil Earth easter egg |
 
@@ -89,7 +89,7 @@ Fold rule: first viewport must not show `#doing` section title (desktop 1440×90
 Prefer:
 
 - `.site-header`, `.site-nav`, `.btn`, `.btn-primary`, `.btn-secondary`
-- `.card`, `.card-grid`
+- `.card`, `.card-grid` (legacy glass); projects use `.tarot-grid`, `.tarot-card`
 - `.post-list`, `.post-item`, `.prose`
 - `.section`, `.section-title`, `.container`
 

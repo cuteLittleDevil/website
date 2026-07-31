@@ -272,6 +272,81 @@ ${posts
 }
 
 /**
+/** Roman numerals for tarot card index (1-based, 1…39). */
+function toRoman(n) {
+  if (n < 1 || n > 39) return String(n);
+  const table = [
+    [10, "X"],
+    [9, "IX"],
+    [5, "V"],
+    [4, "IV"],
+    [1, "I"],
+  ];
+  let x = n;
+  let out = "";
+  for (const [v, s] of table) {
+    while (x >= v) {
+      out += s;
+      x -= v;
+    }
+  }
+  return out;
+}
+
+/** Geometric sigils (stroke only) — cycle by project index; no stock tarot art. */
+function tarotSigilSvg(index) {
+  const variant = index % 3;
+  if (variant === 0) {
+    // Network / constellation nodes
+    return `<svg class="tarot-card__sigil-svg" viewBox="0 0 64 64" width="40" height="40" aria-hidden="true" focusable="false">
+      <circle cx="32" cy="14" r="3.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="14" cy="42" r="3.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="50" cy="42" r="3.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="32" cy="36" r="2.2" fill="currentColor" opacity="0.85"/>
+      <path d="M32 17.5 L32 33.5 M32 36 L16.5 40.5 M32 36 L47.5 40.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>`;
+  }
+  if (variant === 1) {
+    // Stream / wave arcs
+    return `<svg class="tarot-card__sigil-svg" viewBox="0 0 64 64" width="40" height="40" aria-hidden="true" focusable="false">
+      <path d="M12 28 C20 18, 28 18, 32 28 C36 38, 44 38, 52 28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M12 40 C20 30, 28 30, 32 40 C36 50, 44 50, 52 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity="0.75"/>
+      <circle cx="32" cy="34" r="2.4" fill="currentColor"/>
+    </svg>`;
+  }
+  // Star / journal spark
+  return `<svg class="tarot-card__sigil-svg" viewBox="0 0 64 64" width="40" height="40" aria-hidden="true" focusable="false">
+    <circle cx="32" cy="32" r="10" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.55"/>
+    <path d="M32 12 L34.2 27.8 L50 32 L34.2 36.2 L32 52 L29.8 36.2 L14 32 L29.8 27.8 Z" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/>
+    <circle cx="32" cy="32" r="2.2" fill="currentColor"/>
+  </svg>`;
+}
+
+function renderTarotProjectCard(project, index) {
+  const name = String(project.name || `项目 ${index + 1}`);
+  const description = String(project.description || "");
+  const url = String(project.url || "#");
+  const tags = Array.isArray(project.tags) ? project.tags : [];
+  const suit = tags.length ? String(tags[0]) : "开源";
+  const tagsHtml = tags.length
+    ? `<div class="tag-row">${tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>`
+    : "";
+  return `      <article class="tarot-card">
+        <div class="tarot-card__inner">
+          <header class="tarot-card__top">
+            <span class="tarot-card__num">${toRoman(index + 1)}</span>
+            <span class="tarot-card__suit">${escapeHtml(suit)}</span>
+          </header>
+          <div class="tarot-card__sigil" aria-hidden="true">${tarotSigilSvg(index)}</div>
+          <h3 class="tarot-card__title">${escapeHtml(name)}</h3>
+          <p class="tarot-card__desc">${escapeHtml(description)}</p>
+          ${tagsHtml}
+          <a class="tarot-card__link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">查看项目 →</a>
+        </div>
+      </article>`;
+}
+
+/**
  * Sagittarius chart for #doing — poles aligned to sagittarius-bg.jpg
  * (horizontally flipped: bow aims left; object-fit contain → image 1000×562.5, y0≈119).
  *
@@ -464,14 +539,7 @@ ${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
   const doingBlock = renderDoingConstellation(doing, assetV);
 
   const projectsHtml = projects
-    .map(
-      (p) => `      <article class="card">
-        <h3>${escapeHtml(p.name)}</h3>
-        <p>${escapeHtml(p.description)}</p>
-        ${(p.tags || []).length ? `<div class="tag-row">${p.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
-        <a class="card__link" href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer">查看项目 →</a>
-      </article>`
-    )
+    .map((p, i) => renderTarotProjectCard(p, i))
     .join("\n");
 
   const body = `
@@ -504,9 +572,9 @@ ${doingBlock}
     </section>
 
     <section class="section" id="projects">
-      <div class="container">
+      <div class="container container--wide">
         <h2 class="section-title">作品与开源</h2>
-        <div class="card-grid card-grid--2">
+        <div class="tarot-grid">
 ${projectsHtml}
         </div>
       </div>
