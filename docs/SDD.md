@@ -1,7 +1,7 @@
 # SDD — Personal Website
 
 **Status:** Active  
-**Last updated:** 2026-07-30  
+**Last updated:** 2026-07-31  
 **Owner:** cuteLittleDevil  
 **Public name:** 陈懂  
 
@@ -14,11 +14,13 @@ Build a personal site similar in information architecture to [stormzhang.ai](htt
 Public display name is **陈懂**; GitHub identity remains `cuteLittleDevil`.  
 Production domain: **https://cute-little-devil.com**.
 
+**Visual system:** Starfield dark + home **night-voyage narrative** (观测台 → 作品手牌 → 航行日志 → 地面站). Full story and do/don’ts: `DESIGN.md` §0; section DOM: `docs/PAGE-CONTRACTS.md`.
+
 ## 2. Goals
 
 | ID | Goal |
 |----|------|
-| G1 | Static HTML site with fixed visual constraints (Linear-inspired DESIGN.md) |
+| G1 | Static HTML site with fixed visual constraints (Starfield DESIGN.md + narrative arc) |
 | G2 | Write posts as Markdown under `content/posts/`; no CMS |
 | G3 | `npm run build` produces deployable `dist/` |
 | G4 | Push to `main` → GitHub Action build → Cloudflare Pages |

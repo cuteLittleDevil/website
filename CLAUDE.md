@@ -221,4 +221,4 @@
 - **不获取他人私有内容**（见上文「隐私与他人内容」）；对标公开站只学结构/氛围，不扒未授权资源或隐私
 - **每次提交/push 前必须先问用户并展示摘要**（见「提交代码前必须先问用户」）
 
-风格对比页在 `design-previews/`，正式产物默认 **Linear 深色**裁剪风；公开展示名 **陈懂**（GitHub 仍为 cuteLittleDevil）。
+风格对比页在 `design-previews/`；正式产物为 **Starfield 深空** + 首页叙事（观测台 → 作品手牌 → 航行日志 → 地面站，见 `DESIGN.md` §0）；公开展示名 **陈懂**（GitHub 仍为 cuteLittleDevil）。

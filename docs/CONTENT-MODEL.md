@@ -28,17 +28,20 @@ timeline:                # optional about timeline
   - year: string
     text: string
 
-doingLead: string        # optional one-line under section title (e.g. 观测三角 · …)
-doing:                   # “我在做什么” — first 3 items → bright poles (left / top / right); click opens dialog
+doingLead: string        # optional lead under「观测台」(e.g. 手写 ChatGPT · MIT …)
+doing:                   # #doing 观测台 — first 3 → bright poles; click opens dialog
   - role: string         # optional pole label (e.g. 造镜 / 校准 / 星志)
     title: string        # shown on chart + dialog
     description: string  # dialog body only
+
+# Home display titles (hardcoded in build for narrative; see DESIGN.md §0):
+#   #doing 观测台 · #projects 作品手牌 · #writing 航行日志 · #connect 地面站
 
 projects:
   - name: string
     description: string
     url: string
-    tags: string[]       # optional
+    tags: string[]       # optional; tarot suit = first non-generic tag (skips Go/Rust/…), else first tag /「作品」
 
 social:
   - label: string

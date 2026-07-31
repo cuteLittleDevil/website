@@ -28,15 +28,16 @@ Every public page includes:
 
 ## Home `/`
 
-**Section order (fixed):**
+**Narrative:** one night voyage — see `DESIGN.md` §0 Starfield narrative (观测台 → 作品手牌 → 航行日志 → 地面站).  
+**Section order (fixed); `id` stable for anchors/nav:**
 
-| Order | `id` | Content source |
-|------:|------|----------------|
-| 1 | `#hero` | `profile.name`, `tagline`, `profile.bio`, `focus` chips, primary CTAs; full viewport under header |
-| 2 | `#doing` | Sagittarius 12-star chart (3 bright poles from `doing[0..2]`); click pole → `#doing-dialog`; **below the fold** on first paint |
-| 3 | `#projects` | `projects[]` as holographic-foil tarot cards (`.tarot-grid` / `.tarot-card`); face-up, no flip; spacing per DESIGN.md |
-| 4 | `#writing` | latest N posts as **ship log** (`.ship-log` star-trail); title「航行日志」; CTA → `/blog/` |
-| 5 | `#connect` | `social[]` (e.g. GitHub icon + label); do **not** spoil Earth easter egg |
+| Order | `id` | Display title | Content / UI |
+|------:|------|---------------|--------------|
+| 1 | `#hero` | (name) | `profile.*`, focus chips, CTAs; full viewport under header |
+| 2 | `#doing` | **观测台** | Sagittarius chart; poles from `doing[0..2]`; lead = `doingLead`; click → `#doing-dialog`; **below the fold** |
+| 3 | `#projects` | **作品手牌** | `projects[]` foil tarot (`.tarot-grid`); lead「代表作一览」; suit prefers distinctive tag over generic lang |
+| 4 | `#writing` | **航行日志** | latest N posts (`.ship-log`); lead「按时间落下的观测记录」; CTA「打开完整航海志 →」`/blog/` |
+| 5 | `#connect` | **地面站** | `social[]`; lead「公开航道」; **do not** spoil Earth easter egg |
 
 Note: long bio on hero (`profile.bio`); WeChat/email only in Earth easter egg — never advertise the egg in copy.
 

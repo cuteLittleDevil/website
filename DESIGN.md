@@ -1,12 +1,58 @@
-# DESIGN.md — Personal Site (Starfield / stormzhang-inspired)
+# DESIGN.md — Personal Site (Starfield narrative)
 
 > Atmosphere reference: [stormzhang.ai](https://stormzhang.ai/) starfield + deep-space personal landing.  
-> IA follows `docs/PAGE-CONTRACTS.md`: hero (name + bio + focus) → doing → projects → writing → connect.  
+> IA follows `docs/PAGE-CONTRACTS.md`: hero → doing → projects → writing → connect.  
 > Long contact details live in Earth easter egg only.
 
 Agents **must** read this file before changing any visual output. Colors live in `src/styles/tokens.css`.
 
-**Active theme:** Starfield dark (deep navy + cyan accent). Style gallery under `design-previews/` is historical only.
+**Active theme:** Starfield dark (deep navy + cyan accent).  
+**Previews:** `design-previews/tarot-variants.html`, `design-previews/writing-variants.html` (selection only, not production).
+
+---
+
+## 0. Starfield narrative (home story arc)
+
+The home page is not five unrelated blocks. It is one **night voyage** told in different instruments. Each section gets a **distinct metaphor and UI form** so they do not compete, but share the same sky tokens.
+
+### Story (visitor path)
+
+```text
+Hero        入轨 / 自我介绍          full viewport under stars
+#doing      瞄准 · 观测台           Sagittarius chart — where energy aims
+#projects   抽牌 · 作品手牌         foil tarot cards — craft made tangible
+#writing    记航 · 航行日志         star-trail log — what was written down
+#connect    着陆 · 地面站           quiet social — public channel only
+Earth egg   私密信箱（不写在文案里）  solar-system Earth click only
+```
+
+| Order | `id` | Display title | Lead (optional) | Metaphor | UI form | Must not become |
+|------:|------|---------------|-----------------|----------|---------|-----------------|
+| 1 | `#hero` | name / tagline | bio + focus | 入轨 | full-bleed hero | heavy panels covering sky |
+| 2 | `#doing` | **观测台** | `doingLead` from yaml | 瞄准 / 星座 | SVG chart + poles + dialog | second card grid |
+| 3 | `#projects` | **作品手牌** | 代表作一览 | 命运与手艺 | holographic foil tarot | another constellation |
+| 4 | `#writing` | **航行日志** | 按时间落下的观测记录 | 航迹 / 星历 | vertical star-trail list | tarot or full sky map |
+| 5 | `#connect` | **地面站** | 公开航道 | 着陆 / 通讯 | quiet pills / icons | loud contact marketing |
+
+### Design principles (narrative)
+
+1. **One sky, many instruments** — shared canvas, tokens, type; different *widgets* per chapter.
+2. **Escalate then land** — spatial wonder (`#doing`) → ritual objects (`#projects`) → time-ordered text (`#writing`) → quiet real-world channel (`#connect`).
+3. **Do not repeat the same trick** — never two constellation charts, two flip-card decks, or two neon timelines.
+4. **Metaphor is garnish** — section titles may be poetic; body copy and nav stay scannable (nav may use short labels: 作品 → `#projects`).
+5. **Earth easter egg stays secret** — no section title, lead, or footer may hint at the egg; WeChat/email only inside the dialog.
+6. **8pt grid + cyan/blue only** — no gold/purple as brand primary (foil edge may use a whisper of violet on the 2px rim only).
+
+### Why these three mid-sections differ
+
+| Chapter | Why this form |
+|---------|----------------|
+| 观测台 | “我在做什么” is directional — a **map of aim** fits Sagittarius / bright poles. |
+| 作品手牌 | Projects are finite, chosen, showable — **cards** read as dealt craft, not a second sky. |
+| 航行日志 | Posts are chronological prose — a **log / trail** beats another card grid. |
+| 地面站 | Contact is real-world — **minimal chrome** so the sky stays dominant; privacy rules above. |
+
+When adding a new home block: update this table + `docs/PAGE-CONTRACTS.md` first; pick a metaphor that is not already used.
 
 ---
 
@@ -18,6 +64,7 @@ Agents **must** read this file before changing any visual output. Colors live in
 - Glass panels: translucent surface + hairline + light blur so text stays readable over stars.
 - Chromatic accent: cyan `#38f9d7` + soft sky blue `#60a5fa` (name gradient / CTAs / links).
 - System UI stack (SF / 苹方 on Apple); quiet, personal, night-sky feel. No third-party webfonts.
+- Home copy/titles follow **§0 Starfield narrative**.
 
 ## 2. Color Palette & Roles
 
@@ -226,9 +273,10 @@ Main / header / footer: `position: relative; z-index: 1+`.
 ## 9. Agent Prompt Guide
 
 ```
-Follow DESIGN.md starfield theme.
-Canvas #050510, accent #38f9d7 / #60a5fa, glass cards, fixed #starfield canvas.
-Home sections per PAGE-CONTRACTS.md. No Linear lavender primary.
+Follow DESIGN.md starfield theme + §0 home narrative.
+Canvas #050510, accent #38f9d7 / #60a5fa, glass, fixed #starfield canvas.
+Home: 观测台 → 作品手牌 → 航行日志 → 地面站 (ids per PAGE-CONTRACTS).
+No Linear lavender primary. Do not spoil Earth egg.
 ```
 
 ## 10. Brand note

@@ -353,12 +353,21 @@ function tarotSigilSvg(index) {
   </svg>`;
 }
 
+/** Tarot “suit”: prefer a distinctive tag over generic language labels (e.g. Go). */
+function tarotSuit(tags) {
+  const list = (Array.isArray(tags) ? tags : []).map((t) => String(t).trim()).filter(Boolean);
+  if (!list.length) return "作品";
+  const generic = new Set(["go", "golang", "rust", "java", "python", "js", "ts", "typescript", "javascript"]);
+  const hit = list.find((t) => !generic.has(t.toLowerCase()));
+  return hit || list[0];
+}
+
 function renderTarotProjectCard(project, index) {
   const name = String(project.name || `项目 ${index + 1}`);
   const description = String(project.description || "");
   const url = String(project.url || "#");
   const tags = Array.isArray(project.tags) ? project.tags : [];
-  const suit = tags.length ? String(tags[0]) : "开源";
+  const suit = tarotSuit(tags);
   const tagsHtml = tags.length
     ? `<div class="tag-row">${tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>`
     : "";
@@ -596,7 +605,7 @@ ${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
 
     <section class="section" id="doing">
       <div class="container container--wide">
-        <h2 class="section-title">我在做什么</h2>
+        <h2 class="section-title">观测台</h2>
         ${doingLeadHtml}
 ${doingBlock}
       </div>
@@ -604,7 +613,8 @@ ${doingBlock}
 
     <section class="section" id="projects">
       <div class="container container--wide">
-        <h2 class="section-title">作品与开源</h2>
+        <h2 class="section-title">作品手牌</h2>
+        <p class="section-lead">代表作一览</p>
         <div class="tarot-grid">
 ${projectsHtml}
         </div>
@@ -622,7 +632,8 @@ ${projectsHtml}
 
     <section class="section" id="connect">
       <div class="container">
-        <h2 class="section-title">在这里找到我</h2>
+        <h2 class="section-title">地面站</h2>
+        <p class="section-lead">公开航道</p>
         <ul class="social-list">
 ${socialHtml}
         </ul>

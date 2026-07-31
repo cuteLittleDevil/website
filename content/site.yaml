@@ -1,6 +1,6 @@
 site:
   title: 陈懂
-  description: 陈懂 — Go 高并发网络 · JT808 / 流媒体 · 开源与工程实践。个人主页与技术笔记。
+  description: 陈懂 — Go 高并发网络 · JT808 / 流媒体 · 工程实践与技术笔记。
   language: zh-CN
   # Production domain (bind in Cloudflare Pages Custom domains when ready)
   baseUrl: "https://cute-little-devil.com"
@@ -37,7 +37,7 @@ easterEgg:
 
 timeline: []
 
-doingLead: 手写 ChatGPT · MIT 课程 · 开源项目
+doingLead: 手写 ChatGPT · MIT 课程 · AI 科普 · 点击亮星查看
 doing:
   - role: 造镜
     title: 手写 ChatGPT

@@ -53,8 +53,9 @@ LLMs are good at filling structure, bad at remembering brand over many turns.
 | 发博客 / 改笔记 | `content/posts/**` | templates, CSS |
 | 改简介 / 项目 | `content/site.yaml` | layout order |
 | 微调间距颜色 | `DESIGN.md` + `src/styles/*` | post markdown |
-| 加新首页区块 | `PAGE-CONTRACTS.md` → templates → build | random DOM |
-| 换风格 | rewrite DESIGN + tokens; keep contracts | redesign IA |
+| 加新首页区块 | `DESIGN.md` §0 + `PAGE-CONTRACTS.md` → templates → build | random DOM / repeat metaphor |
+| 换风格 | rewrite DESIGN + tokens; keep narrative arc | redesign IA |
+| 改区块标题/叙事 | `DESIGN.md` §0 + `PAGE-CONTRACTS` + `build.mjs` titles | invent second sky/tarot/timeline |
 | 修 CI 部署 | `.github/workflows/*`, README secrets | content |
 
 ---
@@ -62,11 +63,11 @@ LLMs are good at filling structure, bad at remembering brand over many turns.
 ## Generation prompt pattern (copy-paste)
 
 ```
-Read DESIGN.md, docs/PAGE-CONTRACTS.md, docs/CONTENT-MODEL.md, docs/SDD.md, CLAUDE.md.
+Read DESIGN.md (esp. §0 narrative), docs/PAGE-CONTRACTS.md, docs/CONTENT-MODEL.md, docs/SDD.md, CLAUDE.md.
 Implement only the requested change.
 Use content from content/site.yaml and content/posts (owner-provided only).
 Run npm run build and fix errors.
-Do not add new brand colors. Do not reorder home sections without updating PAGE-CONTRACTS.md.
+Do not add new brand colors. Do not reorder home sections or reuse constellation/tarot/log forms without updating DESIGN §0 + PAGE-CONTRACTS.
 Do not fetch private repos, auth-gated pages, others' PII, or secrets.
 Do not git commit or push unless the user explicitly confirmed this turn.
 ```
