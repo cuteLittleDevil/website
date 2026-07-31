@@ -271,7 +271,38 @@ ${posts
   </ul>`;
 }
 
-/**
+/** Home #writing — ship log / star-trail timeline (style 1). */
+function formatStardate(dateStr) {
+  const s = String(dateStr || "");
+  return s.includes("-") ? s.replaceAll("-", ".") : s;
+}
+
+function renderShipLog(posts, { emptyText = "暂无航迹" } = {}) {
+  if (!posts.length) {
+    return `<p class="empty">${escapeHtml(emptyText)}</p>`;
+  }
+  return `<ol class="ship-log">
+${posts
+  .map((p, i) => {
+    const nowClass = i === 0 ? " ship-log__item--now" : "";
+    const tags = (p.tags || [])
+      .map((t) => `<span class="tag">${escapeHtml(t)}</span>`)
+      .join("");
+    const tagsHtml = tags ? `<div class="ship-log__tags">${tags}</div>` : "";
+    const summaryHtml = p.summary
+      ? `<p class="ship-log__summary">${escapeHtml(p.summary)}</p>`
+      : "";
+    return `    <li class="ship-log__item${nowClass}">
+      <span class="ship-log__stardate"><span class="ship-log__stardate-label">星历</span><time datetime="${escapeHtml(p.date)}">${escapeHtml(formatStardate(p.date))}</time></span>
+      <a class="ship-log__title" href="${escapeHtml(p.url)}">${escapeHtml(p.title)}</a>
+      ${summaryHtml}
+      ${tagsHtml}
+    </li>`;
+  })
+  .join("\n")}
+  </ol>`;
+}
+
 /** Roman numerals for tarot card index (1-based, 1…39). */
 function toRoman(n) {
   if (n < 1 || n > 39) return String(n);
@@ -582,9 +613,10 @@ ${projectsHtml}
 
     <section class="section" id="writing">
       <div class="container">
-        <h2 class="section-title">最近写作</h2>
-        ${renderPostList(latest)}
-        <p class="section-more"><a href="/blog/">全部文章 →</a></p>
+        <h2 class="section-title">航行日志</h2>
+        <p class="section-lead">按时间落下的观测记录</p>
+        ${renderShipLog(latest)}
+        <p class="section-more"><a href="/blog/">打开完整航海志 →</a></p>
       </div>
     </section>
 

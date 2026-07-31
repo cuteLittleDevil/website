@@ -138,6 +138,18 @@ Vertical stack top → bottom (all tokens from §5):
 
 Chrome: Roman numeral + first tag as suit; center geometric sigil (SVG, cycles by index); title → description → tags → link. Hover: lift **4px** (`space-1`) + stronger foil glow. `prefers-reduced-motion`: freeze foil shift + no lift.
 
+### Writing ship log (`#writing`) — style **1 航行日志**
+
+Home latest posts as a **star-trail timeline** (not a second constellation chart, not tarot cards):
+
+- **Title / lead:** 「航行日志」+ 「按时间落下的观测记录」
+- **Track:** 1px vertical gradient (cyan → blue → fade) at left; each entry a node (9px ring)
+- **Now:** first (newest) node filled + soft cyan glow (`ship-log__item--now`)
+- **Stack (8pt):** item pad-bottom space-5 (24); content inset-left 28px; stardate → title space-2; title → summary space-2; tags gap space-2, margin-top space-3
+- **Stardate:** mono label「星历」+ `YYYY.MM.DD` (from post `date`)
+- **CTA:** 「打开完整航海志 →」→ `/blog/` (blog index stays plain `.post-list`)
+- **Motion:** none required; glow is static. Respect reduced-motion (no extra animation)
+
 ### Nav
 
 - Sticky glass bar; bottom hairline; mute → ink on hover.

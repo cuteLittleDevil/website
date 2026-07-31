@@ -35,7 +35,7 @@ Every public page includes:
 | 1 | `#hero` | `profile.name`, `tagline`, `profile.bio`, `focus` chips, primary CTAs; full viewport under header |
 | 2 | `#doing` | Sagittarius 12-star chart (3 bright poles from `doing[0..2]`); click pole → `#doing-dialog`; **below the fold** on first paint |
 | 3 | `#projects` | `projects[]` as holographic-foil tarot cards (`.tarot-grid` / `.tarot-card`); face-up, no flip; spacing per DESIGN.md |
-| 4 | `#writing` | latest N posts (default 5) from build |
+| 4 | `#writing` | latest N posts as **ship log** (`.ship-log` star-trail); title「航行日志」; CTA → `/blog/` |
 | 5 | `#connect` | `social[]` (e.g. GitHub icon + label); do **not** spoil Earth easter egg |
 
 Note: long bio on hero (`profile.bio`); WeChat/email only in Earth easter egg — never advertise the egg in copy.

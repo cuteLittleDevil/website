@@ -1211,7 +1211,7 @@ img {
   background: rgba(var(--blue-rgb), 0.08);
 }
 
-/* Posts */
+/* Posts — blog index plain list */
 .post-list {
   list-style: none;
   padding: 0;
@@ -1255,6 +1255,108 @@ img {
   font-size: var(--text-body-sm);
   color: var(--color-mute);
   line-height: var(--leading-ui);
+}
+
+/*
+ * #writing — ship log (star-trail timeline)
+ * Spacing: DESIGN.md § Writing ship log
+ */
+.ship-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.ship-log::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--accent-rgb), 0.55),
+    rgba(var(--blue-rgb), 0.28) 55%,
+    transparent
+  );
+}
+
+.ship-log__item {
+  position: relative;
+  padding: 0 0 var(--space-5) 28px;
+}
+
+.ship-log__item:last-child {
+  padding-bottom: 0;
+}
+
+.ship-log__item::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-canvas);
+  border: 1.5px solid rgba(var(--accent-rgb), 0.55);
+  box-shadow: 0 0 0 3px rgba(5, 5, 16, 0.9);
+}
+
+.ship-log__item--now::before {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 3px rgba(5, 5, 16, 0.9),
+    0 0 12px rgba(var(--accent-rgb), 0.55);
+}
+
+.ship-log__stardate {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
+}
+
+.ship-log__stardate-label {
+  margin-right: var(--space-2);
+  font-weight: 400;
+  color: var(--color-mute-deep);
+}
+
+.ship-log__stardate time {
+  font-inherit;
+  color: inherit;
+}
+
+.ship-log__title {
+  color: var(--color-ink);
+  font-weight: 600;
+  font-size: var(--text-body-md);
+  letter-spacing: var(--tracking-tight);
+  text-decoration: none;
+}
+
+.ship-log__title:hover {
+  color: var(--color-primary);
+}
+
+.ship-log__summary {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-body-sm);
+  color: var(--color-mute);
+  line-height: var(--leading-ui);
+}
+
+.ship-log__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .empty {
