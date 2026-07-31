@@ -115,23 +115,63 @@ jobs:
           # Length only — never print the token
           echo "Token length: ${#CLOUDFLARE_API_TOKEN} (should be > 20)"
           echo "Account ID length: ${#CLOUDFLARE_ACCOUNT_ID} (hex, usually 32)"
-          echo "Runner region tip: 52x HTML from api.cloudflare.com is Cloudflare-side (521=web server down, 522=connection timed out)."
+          echo "Note: 521/522 HTML from api.cloudflare.com = path from this runner → Cloudflare API is broken (not dist/)."
 
-          # Retry: Cloudflare API sometimes returns HTML 52x instead of JSON
-          code=""
+          # Network path diagnostics (no secrets)
+          echo "=== DNS / connectivity (api.cloudflare.com) ==="
+          getent ahosts api.cloudflare.com | head -10 || true
+          # Prefer IPv4: some Actions paths misbehave on v6 to CF edges
+          CURL_IP=(-4)
+          curl "${CURL_IP[@]}" -sS -o /dev/null -w "curl -4 HEAD api.cloudflare.com → HTTP %{http_code} time=%{time_total}s\n" \
+            --connect-timeout 15 --max-time 30 -I "https://api.cloudflare.com/" || echo "curl -4 HEAD failed"
+          curl -sS -o /dev/null -w "curl dualstack HEAD api.cloudflare.com → HTTP %{http_code} time=%{time_total}s\n" \
+            --connect-timeout 15 --max-time 30 -I "https://api.cloudflare.com/" || echo "curl dualstack HEAD failed"
+
+          # 1) Token verify (lighter than Pages list)
+          echo "=== Token verify ==="
           for attempt in 1 2 3 4 5 6; do
-            code=$(curl -sS -o /tmp/cf-pages.json -w "%{http_code}" \
+            code=$(curl "${CURL_IP[@]}" -sS -o /tmp/cf-token.json -w "%{http_code}" \
+              --connect-timeout 20 --max-time 90 \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/user/tokens/verify" || true)
+            echo "tokens/verify attempt ${attempt}: HTTP ${code}"
+            if [ "$code" = "200" ]; then
+              python3 - <<'PY'
+          import json
+          d=json.load(open("/tmp/cf-token.json"))
+          print("token verify success=", d.get("success"), "status=", (d.get("result") or {}).get("status"))
+          print("errors=", d.get("errors"))
+          PY
+              break
+            fi
+            case "$code" in
+              520|521|522|523|524|502|503|504)
+                sleep $((attempt * 10))
+                continue
+                ;;
+            esac
+            # 401/403 still parseable — show body tip
+            head -c 200 /tmp/cf-token.json; echo
+            break
+          done
+
+          # 2) List Pages projects (what wrangler also hits)
+          echo "=== List Pages projects ==="
+          code=""
+          for attempt in 1 2 3 4 5 6 7 8; do
+            code=$(curl "${CURL_IP[@]}" -sS -o /tmp/cf-pages.json -w "%{http_code}" \
               --connect-timeout 20 --max-time 90 \
               -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
               -H "Content-Type: application/json" \
               "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" || true)
-            echo "Cloudflare list-projects attempt ${attempt}: HTTP ${code}"
+            echo "list-projects attempt ${attempt}: HTTP ${code}"
             if [ "$code" = "200" ]; then
               break
             fi
             case "$code" in
               520|521|522|523|524|502|503|504)
-                echo "Transient Cloudflare edge/API error ${code}; sleeping before retry…"
+                echo "Transient Cloudflare edge/API error ${code}; sleeping…"
                 sleep $((attempt * 12))
                 continue
                 ;;
@@ -147,10 +187,12 @@ jobs:
           try:
               d = json.load(open("/tmp/cf-pages.json"))
           except Exception as e:
-              print("Could not parse API response:", e)
+              print("Could not parse list-projects response:", e)
               print("Body starts with:", raw[:200])
-              print("Hint: HTTP 521/522/5xx + HTML = temporary Cloudflare API issue (not your site code).")
-              print("Check https://www.cloudflarestatus.com/ then re-run the workflow.")
+              print("==> Conclusion: GitHub Actions cannot reach Cloudflare Pages API reliably (521/522).")
+              print("    Your secrets look present (lengths OK). This is NOT a static-site build bug.")
+              print("    Next: (1) https://www.cloudflarestatus.com/  (2) re-run later  (3) deploy from your Mac:")
+              print("      npx wrangler@4 pages deploy dist --project-name=website")
               sys.exit(1)
           print("api.success =", d.get("success"))
           print("api.errors  =", d.get("errors"))
@@ -167,19 +209,16 @@ jobs:
           if [ "$code" != "200" ]; then
             case "$code" in
               520|521|522|523|524|502|503|504)
-                echo "::error::Cloudflare API returned HTTP ${code} after retries (HTML error page, Ray ID in Wrangler logs if any). This is almost never a token permission issue — re-run later; see https://www.cloudflarestatus.com/"
+                echo "::error::Cloudflare API still HTTP ${code} after retries from this runner. Site code is fine; wait/re-run or deploy from local network. Status: https://www.cloudflarestatus.com/"
                 exit 1
                 ;;
             esac
-            echo "::error::Cloudflare rejected credentials (HTTP ${code}, code 10000 is almost always wrong/missing Pages Edit permission or wrong Account ID)."
-            echo "Fix: API Tokens → Create Token → Custom → Permissions: Account | Cloudflare Pages | Edit → Account Resources: include THIS account."
-            echo "Do NOT use only the 'Edit Cloudflare Workers' template (it often lacks Pages)."
+            echo "::error::Cloudflare rejected credentials (HTTP ${code}). Create Token: Account | Cloudflare Pages | Edit on this account."
             exit 1
           fi
 
           exists=$(cat /tmp/cf-project-exists)
           echo "exists=$exists" >> "$GITHUB_OUTPUT"
-
       - name: Wrangler whoami (debug)
         run: |
           set -euo pipefail
