@@ -35,7 +35,7 @@
   --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", monospace;
 
-  --text-display-xl: clamp(2.5rem, 6.5vw, 4rem);
+  --text-display-xl: clamp(2.5rem, 6.5vw, 4.5rem); /* 40–72px, hero name */
   --text-display-lg: clamp(1.625rem, 3.2vw, 2.25rem);
   --text-display-md: 1.25rem;
   --text-body-lg: 1.125rem;

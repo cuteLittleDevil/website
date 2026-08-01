@@ -21,8 +21,10 @@ profile:
   tagline: string
   avatar: string         # URL
   github: string         # profile URL
-  bio: string            # short paragraph, markdown-ish plain text OK
-  focus: string[]        # chips / bullets under hero or about
+  bio: string            # optional short paragraph; omit if unused
+  focus:                 # chips under hero; url optional (no url = plain chip)
+    - label: string
+      url: string        # optional https link
 
 timeline:                # optional about timeline
   - year: string

@@ -39,7 +39,7 @@ Every public page includes:
 | 4 | `#writing` | **航行日志** | latest N posts (`.ship-log`); no lead; CTA「打开完整航海志 →」`/blog/` |
 | 5 | `#connect` | **地面站** | `social[]`; no lead; **do not** spoil Earth easter egg |
 
-Note: long bio on hero (`profile.bio`); WeChat/email only in Earth easter egg — never advertise the egg in copy.
+Note: optional bio on hero (`profile.bio`); focus chips may link via optional `url`. WeChat/email only in Earth easter egg — never advertise the egg in copy.
 
 Hero CTAs:
 

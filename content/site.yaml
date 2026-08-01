@@ -9,18 +9,18 @@ site:
 profile:
   name: 陈懂
   handle: cuteLittleDevil
-  tagline: Go · 高并发网络 · JT808 · 流媒体
+  tagline: Go · 高并发网络 · AI
   avatar: https://avatars.githubusercontent.com/u/38343763?v=4
   github: https://github.com/cuteLittleDevil
-  bio: >
-    6 年 Go 后端经验，擅长高性能、高可用网络编程与私有协议落地。
-    欢迎交流协议、流媒体与工程落地。
   focus:
-    - JT808 / JT1078
-    - 任务状态机
-    - 手写ChatGPT
+    - label: JT808 / JT1078
+      url: https://github.com/cuteLittleDevil/go-jt808
+    - label: MIT课程
+      url: https://github.com/cuteLittleDevil/mit
+    - label: 手写ChatGPT
+      # url 预留
 
-# 地球彩蛋：联系方式为主（简介只在主栏 bio）
+# 地球彩蛋：联系方式为主
 easterEgg:
   badge: 地球来信 · 你发现了彩蛋
   title: 陈懂

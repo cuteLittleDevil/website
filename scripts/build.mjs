@@ -207,6 +207,7 @@ function layout({
     ? `
   <script src="/js/solar-system.js?v=${v}" defer></script>
   <script src="/js/scroll-hint.js?v=${v}" defer></script>
+  <script src="/js/hero-cta.js?v=${v}" defer></script>
   <script src="/js/doing-sky.js?v=${v}" defer></script>`
     : "";
   return `<!DOCTYPE html>
@@ -593,7 +594,18 @@ function renderHome(siteData, posts, assetV = "0") {
 
   const focusHtml = (profile.focus || []).length
     ? `<ul class="hero__focus">
-${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
+${profile.focus
+  .map((f) => {
+    const label = typeof f === "string" ? f : f?.label;
+    if (!label) return "";
+    const url = typeof f === "object" && f?.url ? String(f.url) : "";
+    const text = escapeHtml(label);
+    return url
+      ? `      <li><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${text}</a></li>`
+      : `      <li>${text}</li>`;
+  })
+  .filter(Boolean)
+  .join("\n")}
     </ul>`
     : "";
 
@@ -617,9 +629,9 @@ ${profile.focus.map((f) => `      <li>${escapeHtml(f)}</li>`).join("\n")}
             ? `<p class="hero__bio">${escapeHtml(String(profile.bio).replaceAll("\n", " ").replace(/\s+/g, " ").trim())}</p>`
             : ""
         }
-        <div class="btn-row">
-          <a class="btn btn-primary" href="/blog/">阅读博客</a>
-          <a class="btn btn-secondary" href="${escapeHtml(profile.github)}" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <div class="btn-row" data-solid="blog">
+          <a class="btn btn-primary" data-cta="blog" href="/blog/">博客</a>
+          <a class="btn btn-secondary" data-cta="github" href="${escapeHtml(profile.github)}" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
         ${focusHtml}
       </div>
@@ -756,7 +768,13 @@ function main() {
   // Build CSS first so HTML can cache-bust with content hash (Cloudflare immutable static).
   const cssBundle = buildCssBundle();
   const stampParts = [cssBundle];
-  for (const name of ["solar-system.js", "scroll-hint.js", "doing-sky.js", "starfield.js"]) {
+  for (const name of [
+    "solar-system.js",
+    "scroll-hint.js",
+    "hero-cta.js",
+    "doing-sky.js",
+    "starfield.js",
+  ]) {
     stampParts.push(fs.readFileSync(path.join(jsSrc, name)));
   }
   const bgPath = path.join(assetsSrc, "capricornus-bg-removebg-preview.png");
